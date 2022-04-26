@@ -1,15 +1,8 @@
 EffectLib - Manage your effects the nice way.
 =========
 
-# Note - Outdated!
 
-Development of this plugin/lib has been moved to http://github.com/elBukkit/EffectLib/ with much respect and appreciation to Slikey!
-
-This move was mainly done so the Maven group id could be changed to something that can be verified for submission to Maven central.
-
-# Introduction
-
-You have no idea what an vector or matrix is, but you want to give your users some nice effects with particles? No problem. this library comes with a load of effects for you. It handles rotation, text-parsing, and creation of 3D objects with particles in Minecraft.
+You have no idea what a vector or matrix is, but you want to give your users some nice effects with particles? No problem. this library comes with a load of effects for you. It handles rotation, text-parsing, and creation of 3D objects with particles in Minecraft.
 
   - Text-Parsing
   - 3D cubes, spheres, stars and others
@@ -20,6 +13,9 @@ Find more information on [BukkitForums] [forum] or [BukkitDev] [dev]!
 
 Note that **this library** is no standalone plugin! You have to **create yourself a plugin** to run the effects!
 
+See here: https://github.com/elBukkit/EffectLibDemo
+for a full working example.
+
 # How to Shade
 
 It is recommended to shade this plugin into yours. This way users of your plugin do not need to install EffectLib separately.
@@ -28,11 +24,11 @@ This easy to do with Maven. First, add the elMakers repository:
 
 ```
     <repositories>
-        <repository>
-            <id>github</id>
-            <url>https://maven.pkg.github.com/Slikey/EffectLib</url>
-        </repository>
-<!-- Use this repository if you need snapshot builds -->
+      <repository>
+          <id>Maven Central</id>
+          <url>https://repo1.maven.org/maven2/</url>
+      </repository>
+<!-- Use this repository ONLY if you need snapshot builds -->
         <repository>
             <id>elMakers</id>
             <url>http://maven.elmakers.com/repository/</url>
@@ -44,9 +40,9 @@ Then add the EffectLib dependency:
 
 ```
         <dependency>
-            <groupId>de.slikey</groupId>
+            <groupId>com.elmakers.mine.bukkit</groupId>
             <artifactId>EffectLib</artifactId>
-            <version>6.3</version>
+            <version>9.4</version>
             <scope>compile</scope>
         </dependency>
 
@@ -61,16 +57,26 @@ Then finally add the Maven shade plugin:
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-shade-plugin</artifactId>
-                <version>3.0.0</version>
+                <version>3.8.1</version>
                 <configuration>
                     <minimizeJar>false</minimizeJar>
                     <dependencyReducedPomLocation>${project.build.directory}/dependency-reduced-pom.xml</dependencyReducedPomLocation>
                     <relocations>
+                        <!-- Other relocations can go here, e.g. bstats -->
                         <relocation>
                             <pattern>de.slikey</pattern>
-                            <shadedPattern>com.your.own.package.slikey</shadedPattern>
+                            <shadedPattern>my.own.plugin.namespace.slikey</shadedPattern>
                         </relocation>
                     </relocations>
+                    <filters>
+                        <filter>
+                            <artifact>com.elmakers.mine.bukkit:EffectLib</artifact>
+                            <excludes>
+                                <exclude>plugin.yml</exclude>
+                                <exclude>META-INF/MANIFEST.MF</exclude>
+                            </excludes>
+                        </filter>
+                    </filters>
                 </configuration>
                 <executions>
                     <execution>
@@ -85,6 +91,17 @@ Then finally add the Maven shade plugin:
 ```
 
 Make sure to change the "shadedPattern" to match the base package of your own plugin
+
+# Gradle
+
+To use EffectLib via gradle just add
+
+```
+implementation 'com.elmakers.mine.bukkit:EffectLib:9.4'
+```
+
+To your build.gradle file, remember to change version to the latest version, you can find the latest version in the maven area above.
+
 
 # Support
 

@@ -1,6 +1,38 @@
 package de.slikey.effectlib;
 
-import de.slikey.effectlib.math.Transforms;
+import java.io.File;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
+import java.awt.Font;
+import java.util.List;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.lang.reflect.Field;
+import java.util.UUID;
+import java.util.logging.Level;
+import java.awt.image.BufferedImage;
+import java.lang.reflect.Constructor;
+import java.util.logging.Logger;
+
+import org.bukkit.Color;
+import org.bukkit.Bukkit;
+import org.bukkit.Location;
+import org.bukkit.Material;
+import org.bukkit.Particle;
+import org.bukkit.util.Vector;
+import org.bukkit.entity.Entity;
+import org.bukkit.entity.Player;
+import org.bukkit.plugin.Plugin;
+import org.bukkit.scheduler.BukkitTask;
+import org.bukkit.scheduler.BukkitScheduler;
+import org.bukkit.configuration.MemoryConfiguration;
+import org.bukkit.configuration.ConfigurationSection;
+
+import com.google.common.base.CaseFormat;
+
 import de.slikey.effectlib.util.ConfigUtils;
 import de.slikey.effectlib.util.CustomSound;
 import de.slikey.effectlib.util.Disposable;
@@ -8,37 +40,7 @@ import de.slikey.effectlib.util.DynamicLocation;
 import de.slikey.effectlib.util.ImageLoadCallback;
 import de.slikey.effectlib.util.ImageLoadTask;
 import de.slikey.effectlib.util.ParticleDisplay;
-
-import org.bukkit.Bukkit;
-import org.bukkit.Color;
-import org.bukkit.Location;
-import org.bukkit.Material;
-import org.bukkit.Particle;
-import org.bukkit.configuration.ConfigurationSection;
-import org.bukkit.configuration.MemoryConfiguration;
-import org.bukkit.entity.Entity;
-import org.bukkit.entity.Player;
-import org.bukkit.plugin.Plugin;
-import org.bukkit.scheduler.BukkitScheduler;
-import org.bukkit.scheduler.BukkitTask;
-import org.bukkit.util.Vector;
-
-import java.awt.Font;
-import java.awt.image.BufferedImage;
-import java.io.File;
-import java.lang.reflect.Constructor;
-import java.lang.reflect.Field;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-
-import com.google.common.base.CaseFormat;
+import de.slikey.effectlib.util.ParticleOptions;
 
 /**
  * Dispose the EffectManager if you don't need him anymore.
@@ -48,11 +50,11 @@ import com.google.common.base.CaseFormat;
  */
 public class EffectManager implements Disposable {
 
-    private static List<EffectManager> effectManagers;
-    private static Map<String, Class<? extends Effect>> effectClasses = new HashMap<String, Class<? extends Effect>>();
-    private final Plugin owningPlugin;
-    private final Logger logger;
-    private final Map<Effect, BukkitTask> effects;
+    private static List<EffectManager> effectManagers = new ArrayList<>();
+    private static Map<String, Class<? extends Effect>> effectClasses = new HashMap<>();
+    private Plugin owningPlugin;
+    private Logger logger;
+    private Map<Effect, BukkitTask> effects;
     private ParticleDisplay display;
     private boolean disposed;
     private boolean disposeOnTermination;
@@ -60,7 +62,8 @@ public class EffectManager implements Disposable {
     private boolean stackTraces = true;
     private int visibleRange = 32;
     private File imageCacheFolder;
-    private Map<String, BufferedImage[]> imageCache = new HashMap<String, BufferedImage[]>();
+    private Map<String, BufferedImage[]> imageCache;
+    private final Set<UUID> ignoredPlayers = new HashSet<>();
 
     public EffectManager(Plugin owningPlugin) {
         this(owningPlugin, owningPlugin.getLogger());
@@ -71,69 +74,34 @@ public class EffectManager implements Disposable {
             throw new IllegalArgumentException("EffectManager must be given a valid owning plugin");
         }
         imageCacheFolder = new File(owningPlugin.getDataFolder(), "imagecache");
+        imageCache = new HashMap<>();
         this.owningPlugin = owningPlugin;
         this.logger = logger;
-        Transforms.setEffectManager(this);
-        effects = new HashMap<Effect, BukkitTask>();
+        effects = new HashMap<>();
         disposed = false;
         disposeOnTermination = false;
+        effectManagers.add(this);
     }
 
-    private ParticleDisplay getDisplay() {
-        if (display == null) {
-            display = ParticleDisplay.newInstance();
-        }
-        display.setManager(this);
-
-        return display;
+    public static List<EffectManager> getManagers() {
+        return effectManagers;
     }
 
     public void display(Particle particle, Location center, float offsetX, float offsetY, float offsetZ, float speed, int amount, float size, Color color, Material material, byte materialData, double range, List<Player> targetPlayers) {
-        getDisplay().display(particle, center, offsetX, offsetY, offsetZ, speed, amount, size, color, material, materialData, range, targetPlayers);
+        ParticleOptions options = new ParticleOptions(offsetX, offsetY, offsetZ, speed, amount, size, color, material, materialData);
+        getDisplay().display(particle, options, center, range, targetPlayers);
     }
 
-    public void start(Effect effect) {
-        if (disposed) {
-            throw new IllegalStateException("EffectManager is disposed and not able to accept any effects.");
-        }
-        if (disposeOnTermination) {
-            throw new IllegalStateException("EffectManager is awaiting termination to dispose and not able to accept any effects.");
-        }
+    public void display(Particle particle, ParticleOptions options, Location center, double range, List<Player> targetPlayers) {
+        getDisplay().display(particle, options, center, range, targetPlayers);
+    }
 
-        if (effects.containsKey(effect)) {
-            effect.cancel(false);
-        }
+    private ParticleDisplay getDisplay() {
+        if (display == null) display = ParticleDisplay.newInstance();
 
-        if (!owningPlugin.isEnabled()) return;
+        display.setManager(this);
 
-        BukkitScheduler s = Bukkit.getScheduler();
-        BukkitTask task = null;
-        switch (effect.getType()) {
-            case INSTANT:
-                if(effect.isAsynchronous()) {
-                    task = s.runTaskAsynchronously(owningPlugin, effect);
-                } else {
-                    task = s.runTask(owningPlugin, effect);
-                }
-                break;
-            case DELAYED:
-                if (effect.isAsynchronous()) {
-                    task = s.runTaskLaterAsynchronously(owningPlugin, effect, effect.getDelay());
-                } else {
-                    task = s.runTaskLater(owningPlugin, effect, effect.getDelay());
-                }
-                break;
-            case REPEATING:
-                if (effect.isAsynchronous()) {
-                    task = s.runTaskTimerAsynchronously(owningPlugin, effect, effect.getDelay(), effect.getPeriod());
-                } else {
-                    task = s.runTaskTimer(owningPlugin, effect, effect.getDelay(), effect.getPeriod());
-                }
-                break;
-        }
-        synchronized (this) {
-            effects.put(effect, task);
-        }
+        return display;
     }
 
     public Effect start(String effectClass, ConfigurationSection parameters, Location origin, Entity originEntity) {
@@ -193,9 +161,7 @@ public class EffectManager implements Disposable {
             // A shaded manager may provide a fully-qualified path.
             if (effectLibClass == null && !effectClass.contains(".")) {
                 effectClass = "de.slikey.effectlib.effect." + effectClass;
-                if (!effectClass.endsWith("Effect")) {
-                    effectClass = effectClass + "Effect";
-                }
+                if (!effectClass.endsWith("Effect")) effectClass = effectClass + "Effect";
                 effectLibClass = effectClasses.get(effectClass);
             }
             if (effectLibClass == null) {
@@ -218,11 +184,37 @@ public class EffectManager implements Disposable {
         return effect;
     }
 
-    public Effect getEffect(String effectClass, ConfigurationSection parameters, DynamicLocation origin, DynamicLocation target, ConfigurationSection parameterMap, Player targetPlayer) {
-        Effect effect = getEffectByClassName(effectClass);
-        if (effect == null) {
-            return null;
+    public void start(Effect effect) {
+        if (disposed) throw new IllegalStateException("EffectManager is disposed and not able to accept any effects.");
+        if (disposeOnTermination) throw new IllegalStateException("EffectManager is awaiting termination to dispose and not able to accept any effects.");
+        if (effects.containsKey(effect)) effect.cancel(false);
+        if (!owningPlugin.isEnabled()) return;
+
+        BukkitScheduler s = Bukkit.getScheduler();
+        BukkitTask task = null;
+        switch (effect.getType()) {
+            case INSTANT:
+                if (effect.isAsynchronous()) task = s.runTaskAsynchronously(owningPlugin, effect);
+                else task = s.runTask(owningPlugin, effect);
+                break;
+            case DELAYED:
+                if (effect.isAsynchronous()) task = s.runTaskLaterAsynchronously(owningPlugin, effect, effect.getDelay());
+                else task = s.runTaskLater(owningPlugin, effect, effect.getDelay());
+                break;
+            case REPEATING:
+                if (effect.isAsynchronous()) task = s.runTaskTimerAsynchronously(owningPlugin, effect, effect.getDelay(), effect.getPeriod());
+                else task = s.runTaskTimer(owningPlugin, effect, effect.getDelay(), effect.getPeriod());
+                break;
         }
+        synchronized (this) {
+            effect.setStartTime(System.currentTimeMillis());
+            effects.put(effect, task);
+        }
+    }
+
+    public Effect getEffect(String effectClass, ConfigurationSection parameters, DynamicLocation origin, DynamicLocation target, ConfigurationSection parameterMap, Player targetPlayer, String logContext) {
+        Effect effect = getEffectByClassName(effectClass);
+        if (effect == null) return null;
 
         // Some specific shortcuts
         if (parameters.contains("particle_offset")) {
@@ -240,20 +232,16 @@ public class EffectManager implements Disposable {
 
         Collection<String> keys = parameters.getKeys(false);
         for (String key : keys) {
-            if (key.equals("class")) {
-                continue;
-            }
+            if (key.equals("class")) continue;
 
-            setField(effect, key, parameters, parameterMap);
+            setField(effect, key, parameters, parameterMap, logContext);
         }
 
-        if (origin != null) {
-            effect.setDynamicOrigin(origin);
-        }
+        effect.initialize();
+        if (origin != null) effect.setDynamicOrigin(origin);
         effect.setDynamicTarget(target);
 
-        if (targetPlayer != null)
-            effect.setTargetPlayer(targetPlayer);
+        if (targetPlayer != null) effect.setTargetPlayer(targetPlayer);
 
         return effect;
     }
@@ -261,9 +249,7 @@ public class EffectManager implements Disposable {
     @Deprecated
     public Effect start(String effectClass, ConfigurationSection parameters, DynamicLocation origin, DynamicLocation target, Map<String, String> parameterMap, Player targetPlayer) {
         ConfigurationSection configMap = null;
-        if (parameterMap != null) {
-            configMap = ConfigUtils.toStringConfiguration(parameterMap);
-        }
+        if (parameterMap != null) configMap = ConfigUtils.toStringConfiguration(parameterMap);
 
         return start(effectClass, parameters, origin, target, configMap, targetPlayer);
     }
@@ -281,53 +267,58 @@ public class EffectManager implements Disposable {
      */
     public Effect start(String effectClass, ConfigurationSection parameters, DynamicLocation origin, DynamicLocation target, ConfigurationSection parameterMap, Player targetPlayer) {
         Effect effect = getEffect(effectClass, parameters, origin, target, parameterMap, targetPlayer);
-        if (effect == null) {
-            return null;
-        }
+        if (effect == null) return null;
         effect.start();
         return effect;
     }
     
     public void cancel(boolean callback) {
-        List<Effect> allEffects = new ArrayList<Effect>(effects.keySet());
+        List<Effect> allEffects = new ArrayList<>(effects.keySet());
         for (Effect effect : allEffects) {
             effect.cancel(callback);
         }
     }
-    
+
     public void done(Effect effect) {
+        removeEffect(effect);
+        if (effect.callback != null && owningPlugin.isEnabled()) Bukkit.getScheduler().runTask(owningPlugin, effect.callback);
+        if (disposeOnTermination && effects.isEmpty()) dispose();
+    }
+
+    public void removeEffect(Effect effect) {
         synchronized (this) {
             BukkitTask existingTask = effects.get(effect);
-            if (existingTask != null) {
-                existingTask.cancel();
-            }
+            if (existingTask != null) existingTask.cancel();
             effects.remove(effect);
         }
-        if (effect.callback != null && owningPlugin.isEnabled()) {
-            Bukkit.getScheduler().runTask(owningPlugin, effect.callback);
-        }
-        if (disposeOnTermination && effects.isEmpty()) {
-            dispose();
-        }
     }
-    
+
     @Override
     public void dispose() {
-        if (disposed) {
-            return;
-        }
+        if (disposed) return;
         disposed = true;
         cancel(false);
-        if (effectManagers != null) {
-            effectManagers.remove(this);
-        }
+        effects = null;
+        owningPlugin = null;
+        logger = null;
+        display = null;
+        imageCache = null;
+        owningPlugin = null;
+        imageCacheFolder = null;
+        effectManagers.remove(this);
     }
-    
+
     public void disposeOnTermination() {
         disposeOnTermination = true;
-        if (effects.isEmpty()) {
-            dispose();
-        }
+        if (effects.isEmpty()) dispose();
+    }
+
+    public boolean isDisposed() {
+        return disposed;
+    }
+
+    public boolean isDisposedOnTermination() {
+        return disposeOnTermination;
     }
 
     public void enableDebug(boolean enable) {
@@ -341,15 +332,13 @@ public class EffectManager implements Disposable {
     public boolean isDebugEnabled() {
         return debug;
     }
-    
+
     public void onError(Throwable ex) {
         getLogger().log(Level.SEVERE, "Unexpected EffectLib Error: " + ex.getMessage(), ex);
     }
 
-    public void onError(String message) {
-        if (debug) {
-            getLogger().log(Level.WARNING, message);
-        }
+    public Effect getEffect(String effectClass, ConfigurationSection parameters, DynamicLocation origin, DynamicLocation target, ConfigurationSection parameterMap, Player targetPlayer) {
+        return getEffect(effectClass, parameters, origin, target, parameterMap, targetPlayer, "Unknown");
     }
 
     public void onError(String message, Throwable ex) {
@@ -366,10 +355,14 @@ public class EffectManager implements Disposable {
         return logger;
     }
 
+    public Map<Effect, BukkitTask> getEffects() {
+        return effects;
+    }
+
     public int getParticleRange() {
         return visibleRange;
     }
-    
+
     public void setParticleRange(int range) {
         visibleRange = range;
     }
@@ -378,18 +371,20 @@ public class EffectManager implements Disposable {
         return owningPlugin;
     }
 
-    protected boolean setField(Object effect, String key, ConfigurationSection section, ConfigurationSection parameterMap) {
+    public void onError(String message) {
+        if (debug) getLogger().log(Level.WARNING, message);
+    }
+
+    protected boolean setField(Object effect, String key, ConfigurationSection section, ConfigurationSection parameterMap, String logContext) {
         try {
+            logContext = logContext == null ? "(?)" : logContext;
             String stringValue = section.getString(key);
             String fieldKey = key;
 
             // Allow underscore_style and dash_style parameters
-            if (key.contains("-")) {
-                key = key.replace("-", "_");
-            }
-            if (key.contains("_")) {
-                key = CaseFormat.LOWER_UNDERSCORE.to(CaseFormat.LOWER_CAMEL, key);
-            }
+            if (key.contains("-")) key = key.replace("-", "_");
+
+            if (key.contains("_")) key = CaseFormat.LOWER_UNDERSCORE.to(CaseFormat.LOWER_CAMEL, key);
 
             ConfigurationSection fieldSection = section;
             if (parameterMap != null && stringValue.startsWith("$") && parameterMap.contains(stringValue)) {
@@ -399,54 +394,43 @@ public class EffectManager implements Disposable {
             Field field = effect.getClass().getField(key);
             if (field.getType().equals(Integer.TYPE) || field.getType().equals(Integer.class)) {
                 int intValue = Integer.MAX_VALUE;
-                if (!ConfigUtils.isMaxValue(stringValue)) {
-                    intValue = fieldSection.getInt(fieldKey);
-                }
+                if (!ConfigUtils.isMaxValue(stringValue)) intValue = fieldSection.getInt(fieldKey);
                 field.set(effect, intValue);
             } else if (field.getType().equals(Float.TYPE) || field.getType().equals(Float.class)) {
                 float floatValue = Float.MAX_VALUE;
-                if (!ConfigUtils.isMaxValue(stringValue)) {
-                    floatValue = (float)fieldSection.getDouble(fieldKey);
-                }
+                if (!ConfigUtils.isMaxValue(stringValue)) floatValue = (float) fieldSection.getDouble(fieldKey);
                 field.set(effect,floatValue);
             } else if (field.getType().equals(Double.TYPE) || field.getType().equals(Double.class)) {
                 double doubleValue = Double.MAX_VALUE;
-                if (!ConfigUtils.isMaxValue(stringValue)) {
-                    doubleValue = fieldSection.getDouble(fieldKey);
-                }
+                if (!ConfigUtils.isMaxValue(stringValue)) doubleValue = fieldSection.getDouble(fieldKey);
                 field.set(effect, doubleValue);
             } else if (field.getType().equals(Boolean.TYPE) || field.getType().equals(Boolean.class)) {
                 field.set(effect, fieldSection.getBoolean(fieldKey));
             } else if (field.getType().equals(Long.TYPE) || field.getType().equals(Long.class)) {
                 long longValue = Long.MAX_VALUE;
-                if (!ConfigUtils.isMaxValue(stringValue)) {
-                    longValue = fieldSection.getLong(fieldKey);
-                }
+                if (!ConfigUtils.isMaxValue(stringValue)) longValue = fieldSection.getLong(fieldKey);
                 field.set(effect, longValue);
             } else if (field.getType().equals(Short.TYPE) || field.getType().equals(Short.class)) {
                 short shortValue = Short.MAX_VALUE;
-                if (!ConfigUtils.isMaxValue(stringValue)) {
-                    shortValue = (short)fieldSection.getInt(fieldKey);
-                }
+                if (!ConfigUtils.isMaxValue(stringValue)) shortValue = (short) fieldSection.getInt(fieldKey);
                 field.set(effect, shortValue);
             } else if (field.getType().equals(Byte.TYPE) || field.getType().equals(Byte.class)) {
                 byte byteValue = Byte.MAX_VALUE;
-                if (!ConfigUtils.isMaxValue(stringValue)) {
-                    byteValue = (byte)fieldSection.getInt(fieldKey);
-                }
+                if (!ConfigUtils.isMaxValue(stringValue)) byteValue = (byte) fieldSection.getInt(fieldKey);
                 field.set(effect, byteValue);
             } else if (field.getType().equals(String.class)) {
                 String value = fieldSection.getString(fieldKey);
                 field.set(effect, value);
             } else if (field.getType().equals(Color.class)) {
                 String value = fieldSection.getString(fieldKey);
-                Integer rgb = null;
+                    Integer rgb;
                 if (value.equalsIgnoreCase("random")) {
                     byte red =  (byte)(Math.random() * 255);
                     byte green =  (byte)(Math.random() * 255);
                     byte blue  =  (byte)(Math.random() * 255);
                     rgb = (red << 16) | (green << 8) | blue;
                 } else {
+                        if (value.startsWith("#")) value = value.substring(1);
                     rgb = Integer.parseInt(value, 16);
                 }
                 Color color = Color.fromRGB(rgb);
@@ -485,6 +469,14 @@ public class EffectManager implements Disposable {
                 double y = pieces.length > 1 ? Double.parseDouble(pieces[1]) : 0;
                 double z = pieces.length > 2 ? Double.parseDouble(pieces[2]) : 0;
                 field.set(effect, new Vector(x, y, z));
+            } else if (field.getType().equals(Particle.class)) {
+                String value = fieldSection.getString(fieldKey);
+                // Legacy conversions
+                if (!ParticleDisplay.hasColorTransition() && value.equalsIgnoreCase("DUST_COLOR_TRANSITION")) {
+                    value = "REDSTONE";
+                }
+                Particle particleValue = Particle.valueOf(value.toUpperCase());
+                field.set(effect, particleValue);
             } else if (field.getType().isEnum()) {
                 Class<Enum> enumType = (Class<Enum>)field.getType();
                 String value = fieldSection.getString(fieldKey);
@@ -500,36 +492,23 @@ public class EffectManager implements Disposable {
                 String value = fieldSection.getString(fieldKey);
                 field.set(effect, new CustomSound(value));
             } else {
-                onError("Unable to assign EffectLib property " + key + " of class " + effect.getClass().getSimpleName());
+                onError("Unable to assign EffectLib property " + key + " of class " + effect.getClass().getSimpleName() + " in " + logContext);
                 return false;
             }
 
             return true;
         } catch (Exception ex) {
-            onError("Error assigning EffectLib property " + key + " of class " + effect.getClass().getSimpleName() + ": " + ex.getMessage(), ex);
+            onError("Error assigning EffectLib property " + key + " of class " + effect.getClass().getSimpleName() + " in " + logContext + ": " + ex.getMessage(), ex);
         }
 
         return false;
     }
-    
-    public static void initialize() {
-        effectManagers = new ArrayList<EffectManager>();
-    }
-    
-    public static List<EffectManager> getManagers() {
-        if (effectManagers == null) {
-            initialize();
-        }
-        return effectManagers;
-    }
-    
+
     public static void disposeAll() {
-        if (effectManagers != null) {
-            for (Iterator<EffectManager> i = effectManagers.iterator(); i.hasNext();) {
-                EffectManager em = i.next();
-                i.remove();
-                em.dispose();
-            }
+        for (Iterator<EffectManager> i = effectManagers.iterator(); i.hasNext();) {
+            EffectManager em = i.next();
+            i.remove();
+            em.dispose();
         }
     }
 
@@ -564,5 +543,17 @@ public class EffectManager implements Disposable {
 
     public void registerEffectClass(String key, Class<? extends Effect> effectClass) {
         effectClasses.put(key, effectClass);
+    }
+
+    public boolean isPlayerIgnored(Player player) {
+        return ignoredPlayers.contains(player.getUniqueId());
+    }
+
+    public void ignorePlayer(Player player, boolean ignore) {
+        if (ignore) {
+            ignoredPlayers.add(player.getUniqueId());
+        } else {
+            ignoredPlayers.remove(player.getUniqueId());
+        }
     }
 }

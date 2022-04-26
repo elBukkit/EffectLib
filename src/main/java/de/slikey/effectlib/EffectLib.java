@@ -1,6 +1,7 @@
 package de.slikey.effectlib;
 
 import java.util.List;
+
 import org.bukkit.event.HandlerList;
 import org.bukkit.plugin.java.JavaPlugin;
 
@@ -128,7 +129,7 @@ public final class EffectLib extends JavaPlugin {
 
     @Override
     public void onEnable() {
-        EffectManager.initialize();
+
     }
 
     @Override

@@ -1,12 +1,33 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
-    <groupId>de.slikey</groupId>
+    <groupId>com.elmakers.mine.bukkit</groupId>
     <artifactId>EffectLib</artifactId>
-    <version>6.5-SNAPSHOT</version>
+    <version>9.5-SNAPSHOT</version>
 
     <name>EffectLib</name>
-    <url>http://www.kevin-carstens.de/</url>
+    <description>A library for Bukkit plugins to make complicated particle effects</description>
+    <url>https://github.com/elBukkit/EffectLib/</url>
+
+    <organization>
+        <name>elMakers</name>
+        <url>http://www.elmakers.com/</url>
+    </organization>
+
+    <developers>
+        <developer>
+          <name>Nathan Wolf</name>
+          <email>nathan@elmakers.com</email>
+          <organization>elMakers</organization>
+          <organizationUrl>http://www.elmakers.com</organizationUrl>
+        </developer>
+        <developer>
+            <name>Chronoken</name>
+        </developer>
+        <developer>
+          <name>Slikey</name>
+        </developer>
+  </developers>
 
     <licenses>
         <license>
@@ -20,22 +41,21 @@
     </properties>
 
     <scm>
-        <connection>scm:git:git://github.com/Slikey/EffectLib.git</connection>
-        <developerConnection>scm:git:git@github.com:Slikey/EffectLib.git</developerConnection>
-        <url>https://github.com/Slikey/EffectLib/</url>
+        <connection>scm:git:git://github.com/elBukkit/EffectLib.git</connection>
+        <developerConnection>scm:git:git@github.com:elBukkit/EffectLib.git</developerConnection>
+        <url>https://github.com/elBukkit/EffectLib/</url>
         <tag>master</tag>
     </scm>
 
     <distributionManagement>
-       <repository>
-         <id>github</id>
-         <name>EffectLib Apache Maven Packages</name>
-         <url>https://maven.pkg.github.com/Slikey/EffectLib</url>
-       </repository>
         <snapshotRepository>
-            <id>maven.elmakers.com</id>
-            <url>https://maven.elmakers.com/repository/</url>
+            <id>ossrh</id>
+            <url>https://oss.sonatype.org/content/repositories/snapshots</url>
         </snapshotRepository>
+        <repository>
+            <id>ossrh</id>
+            <url>https://oss.sonatype.org/service/local/staging/deploy/maven2/</url>
+        </repository>
     </distributionManagement>
 
     <repositories>
@@ -47,18 +67,19 @@
 
     <dependencies>
         <dependency>
-            <groupId>org.bukkit</groupId>
-            <artifactId>bukkit</artifactId>
-            <version>1.13-R0.1-SNAPSHOT</version>
+            <groupId>org.spigotmc</groupId>
+            <artifactId>spigot-api</artifactId>
+            <version>1.17-R0.1-SNAPSHOT</version>
             <!-- for testing backwards-compat
+            <version>1.13-R0.1-SNAPSHOT</version>
             <version>1.9-R0.1-SNAPSHOT</version>
             -->
             <scope>provided</scope>
         </dependency>
         <dependency>
-            <groupId>net.objecthunter</groupId>
+            <groupId>com.elmakers.math</groupId>
             <artifactId>exp4j</artifactId>
-            <version>0.4.5</version>
+            <version>1.0</version>
             <scope>compile</scope>
         </dependency>
     </dependencies>
@@ -76,16 +97,17 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
-                <version>3.3</version>
+                <version>3.8.1</version>
                 <configuration>
-                    <source>1.6</source>
-                    <target>1.6</target>
+                    <source>7</source>
+                    <target>7</target>
                 </configuration>
             </plugin>
+
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-shade-plugin</artifactId>
-                <version>1.5</version>
+                <version>3.2.4</version>
                 <executions>
                     <execution>
                         <phase>package</phase>
@@ -99,9 +121,81 @@
                                     <shadedPattern>de.slikey.exp4j</shadedPattern>
                                 </relocation>
                             </relocations>
+                            <filters>
+                                <filter>
+                                    <artifact>com.elmakers.math:exp4j</artifact>
+                                    <excludes>
+                                        <exclude>META-INF/MANIFEST.MF</exclude>
+                                    </excludes>
+                                </filter>
+                            </filters>
                         </configuration>
                     </execution>
                 </executions>
+            </plugin>
+
+            <!-- Generate javadocs -->
+            <plugin>
+              <groupId>org.apache.maven.plugins</groupId>
+              <artifactId>maven-javadoc-plugin</artifactId>
+              <configuration>
+                <additionalparam>-Xdoclint:none</additionalparam>
+                <additionalJOption>-Xdoclint:none</additionalJOption>
+              </configuration>
+              <version>2.9.1</version>
+              <executions>
+                <execution>
+                  <phase>deploy</phase>
+                  <id>attach-javadocs</id>
+                  <goals>
+                    <goal>jar</goal>
+                  </goals>
+                </execution>
+              </executions>
+            </plugin>
+
+            <!-- Release sources alongside the compiled jar -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-source-plugin</artifactId>
+                <version>3.0.1</version>
+                <executions>
+                    <execution>
+                        <id>attach-sources</id>
+                        <goals>
+                            <goal>jar-no-fork</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+
+            <!-- Sign with GPG -->
+            <plugin>
+              <groupId>org.apache.maven.plugins</groupId>
+              <artifactId>maven-gpg-plugin</artifactId>
+              <version>1.5</version>
+              <executions>
+                <execution>
+                  <id>sign-artifacts</id>
+                  <phase>deploy</phase>
+                  <goals>
+                    <goal>sign</goal>
+                  </goals>
+                </execution>
+              </executions>
+            </plugin>
+
+            <!-- Deploy to central repository -->
+            <plugin>
+              <groupId>org.sonatype.plugins</groupId>
+              <artifactId>nexus-staging-maven-plugin</artifactId>
+              <version>1.6.7</version>
+              <extensions>true</extensions>
+              <configuration>
+                <serverId>ossrh</serverId>
+                <nexusUrl>https://oss.sonatype.org/</nexusUrl>
+                <autoReleaseAfterClose>true</autoReleaseAfterClose>
+              </configuration>
             </plugin>
         </plugins>
 

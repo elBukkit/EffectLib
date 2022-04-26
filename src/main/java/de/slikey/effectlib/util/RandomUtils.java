@@ -1,12 +1,14 @@
 package de.slikey.effectlib.util;
 
 import java.util.Random;
+import java.util.concurrent.ThreadLocalRandom;
+
 import org.bukkit.Material;
 import org.bukkit.util.Vector;
 
 public final class RandomUtils {
 
-    public static final Random random = new Random(System.nanoTime());
+    public static final Random random = ThreadLocalRandom.current();
 
     private RandomUtils() {
         // No instance allowed
@@ -19,6 +21,14 @@ public final class RandomUtils {
         z = random.nextDouble() * 2 - 1;
 
         return new Vector(x, y, z).normalize();
+    }
+
+    public static Vector getRandomFlatVector() {
+        double x, z;
+        x = random.nextDouble() * 2 - 1;
+        z = random.nextDouble() * 2 - 1;
+
+        return new Vector(x, 0, z);
     }
 
     public static Vector getRandomCircleVector() {
@@ -39,7 +49,7 @@ public final class RandomUtils {
     }
 
     public static boolean checkProbability(double probability) {
-        return probability >= 1 ? true : random.nextDouble() < probability;
+        return probability >= 1 || random.nextDouble() < probability;
     }
 
 }

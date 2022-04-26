@@ -1,12 +1,13 @@
 package de.slikey.effectlib.effect;
 
-import de.slikey.effectlib.EffectManager;
-import de.slikey.effectlib.EffectType;
-import de.slikey.effectlib.util.RandomUtils;
 import org.bukkit.Effect;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.entity.Entity;
+
+import de.slikey.effectlib.EffectType;
+import de.slikey.effectlib.EffectManager;
+import de.slikey.effectlib.util.RandomUtils;
 
 public class BleedEffect extends de.slikey.effectlib.Effect {
 
@@ -40,8 +41,6 @@ public class BleedEffect extends de.slikey.effectlib.Effect {
         location.getWorld().playEffect(location, Effect.STEP_SOUND, material);
 
         Entity entity = getEntity();
-        if (hurt && entity != null) {
-            entity.playEffect(org.bukkit.EntityEffect.HURT);
-        }
+        if (hurt && entity != null) entity.playEffect(org.bukkit.EntityEffect.HURT);
     }
 }

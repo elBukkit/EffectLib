@@ -1,15 +1,17 @@
 package de.slikey.effectlib.effect;
 
-import de.slikey.effectlib.Effect;
-import de.slikey.effectlib.EffectManager;
-import de.slikey.effectlib.EffectType;
-import de.slikey.effectlib.util.MathUtils;
-import org.bukkit.Particle;
-import de.slikey.effectlib.util.RandomUtils;
-import de.slikey.effectlib.util.VectorUtils;
 import java.util.Random;
+
+import org.bukkit.Particle;
 import org.bukkit.Location;
 import org.bukkit.util.Vector;
+
+import de.slikey.effectlib.Effect;
+import de.slikey.effectlib.EffectType;
+import de.slikey.effectlib.EffectManager;
+import de.slikey.effectlib.util.MathUtils;
+import de.slikey.effectlib.util.RandomUtils;
+import de.slikey.effectlib.util.VectorUtils;
 
 public class CylinderEffect extends Effect {
 
@@ -88,15 +90,14 @@ public class CylinderEffect extends Effect {
 
     @Override
     public void reset() {
-        this.step = 0;
+        step = 0;
     }
 
     @Override
     public void onRun() {
         Location location = getLocation();
-        if (sideRatio == 0) {
-            calculateSideRatio();
-        }
+        if (sideRatio == 0) calculateSideRatio();
+
         Random r = RandomUtils.random;
         double xRotation = rotationX, yRotation = rotationY, zRotation = rotationZ;
         if (orient) {
@@ -142,4 +143,5 @@ public class CylinderEffect extends Effect {
         side = 2 * MathUtils.PI * radius * height;
         sideRatio = side / (side + grounds);
     }
+
 }

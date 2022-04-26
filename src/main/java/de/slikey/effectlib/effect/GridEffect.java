@@ -1,12 +1,13 @@
 package de.slikey.effectlib.effect;
 
-import de.slikey.effectlib.Effect;
-import de.slikey.effectlib.EffectManager;
-import de.slikey.effectlib.EffectType;
-import org.bukkit.Particle;
-import de.slikey.effectlib.util.VectorUtils;
 import org.bukkit.Location;
+import org.bukkit.Particle;
 import org.bukkit.util.Vector;
+
+import de.slikey.effectlib.Effect;
+import de.slikey.effectlib.EffectType;
+import de.slikey.effectlib.EffectManager;
+import de.slikey.effectlib.util.VectorUtils;
 
 public class GridEffect extends Effect {
 
@@ -101,12 +102,8 @@ public class GridEffect extends Effect {
             v.setX(v.getX() + widthCell * -(columns + 1) / 2);
         }
         VectorUtils.rotateAroundAxisY(v, rotation);
-        if (rotationX != 0) {
-            VectorUtils.rotateAroundAxisX(v, rotationX);
-        }
-        if (rotationZ != 0) {
-            VectorUtils.rotateAroundAxisZ(v, rotationZ);
-        }
+        if (rotationX != 0) VectorUtils.rotateAroundAxisX(v, rotationX);
+        if (rotationZ != 0) VectorUtils.rotateAroundAxisZ(v, rotationZ);
         location.add(v);
         display(particle, location);
         location.subtract(v);

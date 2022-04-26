@@ -46,6 +46,13 @@ public class CuboidEffect extends Effect {
     public boolean blockSnap = false;
 
     /**
+     * Calculated length
+     */
+    private double useXLength = 0;
+    private double useYLength = 0;
+    private double useZLength = 0;
+
+    /**
      * State variables
      */
     protected Location minCorner;
@@ -59,9 +66,15 @@ public class CuboidEffect extends Effect {
     }
 
     @Override
+    public void reloadParameters() {
+        initialized = false;
+    }
+
+    @Override
     public void onRun() {
         Location target = getTarget();
         Location location = getLocation();
+        if (target == null || location == null) return;
         if (!initialized) {
             if (blockSnap) {
                 target = target.getBlock().getLocation();
@@ -83,21 +96,28 @@ public class CuboidEffect extends Effect {
                 if (target.getZ() < minCorner.getZ()) {
                     minCorner.setZ(target.getZ());
                 }
-                if (padding != 0) {
-                    minCorner.add(-padding, -padding, -padding);
-                }
-                double extra = padding * 2;
-                if (blockSnap) extra++;
-                xLength = Math.abs(location.getX() - target.getX()) + extra;
-                yLength = Math.abs(location.getY() - target.getY()) + extra;
-                zLength = Math.abs(location.getZ() - target.getZ()) + extra;
+                useXLength = Math.abs(location.getX() - target.getX());
+                useYLength = Math.abs(location.getY() - target.getY());
+                useZLength = Math.abs(location.getZ() - target.getZ());
+            } else {
+                useXLength = xLength;
+                useYLength = yLength;
+                useZLength = zLength;
+            }
+            double extra = padding * 2;
+            if (blockSnap) extra++;
+            useXLength += extra;
+            useYLength += extra;
+            useZLength += extra;
+            if (padding != 0) {
+                minCorner.add(-padding, -padding, -padding);
             }
             initialized = true;
         }
-        drawOutline(location, target);
+        drawOutline();
     }
 
-    private void drawOutline(Location location, Location target) {
+    private void drawOutline() {
         Vector v = new Vector();
         for (int i = 0; i < particles; i++) {
             // X edges
@@ -122,19 +142,19 @@ public class CuboidEffect extends Effect {
 
     private void drawEdge(Vector v, int i, int dx, int dy, int dz) {
         if (dx == 0) {
-            v.setX(xLength * i / particles);
+            v.setX(useXLength * i / particles);
         } else {
-            v.setX(xLength * (dx - 1));
+            v.setX(useXLength * (dx - 1));
         }
         if (dy == 0) {
-            v.setY(yLength * i / particles);
+            v.setY(useYLength * i / particles);
         } else {
-            v.setY(yLength * (dy - 1));
+            v.setY(useYLength * (dy - 1));
         }
         if (dz == 0) {
-            v.setZ(zLength * i / particles);
+            v.setZ(useZLength * i / particles);
         } else {
-            v.setZ(zLength * (dz - 1));
+            v.setZ(useZLength * (dz - 1));
         }
         display(particle, minCorner.add(v));
         minCorner.subtract(v);

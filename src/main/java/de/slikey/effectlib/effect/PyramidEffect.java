@@ -25,11 +25,6 @@ public class PyramidEffect extends Effect {
      */
     public double radius = 0;
 
-    /**
-     * Use corners of blocks
-     */
-    public boolean blockSnap = false;
-
     public PyramidEffect(EffectManager effectManager) {
         super(effectManager);
         type = EffectType.REPEATING;
@@ -68,29 +63,20 @@ public class PyramidEffect extends Effect {
         double ratio = (double)i / particles;
         if (dy == 1) {
             v.setY(ratio);
-            if (dx < 0) {
-                v.setX(ratio - 1);
-            } else {
-                v.setX(1 - ratio);
-            }
-            if (dz < 0) {
-                v.setZ(ratio - 1);
-            } else {
-                v.setZ(1 - ratio);
-            }
+
+			if (dx < 0) v.setX(ratio - 1);
+			else v.setX(1 - ratio);
+
+			if (dz < 0) v.setZ(ratio - 1);
+			else v.setZ(1 - ratio);
         } else {
             v.setY(0);
 
-            if (dx == 0) {
-                v.setX(ratio * 2 - 1);
-            } else {
-                v.setX(dx);
-            }
-            if (dz == 0) {
-                v.setZ(ratio * 2 - 1);
-            } else {
-                v.setZ(dz);
-            }
+			if (dx == 0) v.setX(ratio * 2 - 1);
+			else v.setX(dx);
+
+			if (dz == 0) v.setZ(ratio * 2 - 1);
+			else v.setZ(dz);
         }
         display(particle, center.add(v.multiply(radius)));
         center.subtract(v);

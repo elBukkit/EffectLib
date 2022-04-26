@@ -1,12 +1,14 @@
 package de.slikey.effectlib.effect;
 
-import de.slikey.effectlib.Effect;
-import de.slikey.effectlib.EffectManager;
-import de.slikey.effectlib.EffectType;
 import org.bukkit.Particle;
-import de.slikey.effectlib.util.VectorUtils;
 import org.bukkit.Location;
 import org.bukkit.util.Vector;
+
+import de.slikey.effectlib.Effect;
+import de.slikey.effectlib.EffectType;
+import de.slikey.effectlib.EffectManager;
+import de.slikey.effectlib.util.MathUtils;
+import de.slikey.effectlib.util.VectorUtils;
 
 public class CircleEffect extends Effect {
 
@@ -26,17 +28,17 @@ public class CircleEffect extends Effect {
     public double xRotation, yRotation, zRotation = 0;
 
     /*
-     * Turns the cube by this angle each iteration around the x-axis
+     * Turns the circle by this angle each iteration around the x-axis
      */
     public double angularVelocityX = Math.PI / 200;
 
     /*
-     * Turns the cube by this angle each iteration around the y-axis
+     * Turns the circle by this angle each iteration around the y-axis
      */
     public double angularVelocityY = Math.PI / 170;
 
     /*
-     * Turns the cube by this angle each iteration around the z-axis
+     * Turns the circle by this angle each iteration around the z-axis
      */
     public double angularVelocityZ = Math.PI / 155;
 
@@ -44,6 +46,17 @@ public class CircleEffect extends Effect {
      * Radius of circle above head
      */
     public float radius = .4f;
+
+    /**
+     * Used to make a partial circle
+     */
+    public double maxAngle = Math.PI * 2;
+
+    /**
+     * Start at the same location each step, use this
+     * along with maxAngle and wholeCircle to form persistent semicircles
+     */
+    public boolean resetCircle = false;
 
     /*
      * Current step. Works as a counter
@@ -79,29 +92,35 @@ public class CircleEffect extends Effect {
 
     @Override
     public void reset() {
-        this.step = 0;
+        step = 0;
     }
 
     @Override
     public void onRun() {
         Location location = getLocation();
         location.subtract(xSubtract, ySubtract, zSubtract);
-        double inc = (2 * Math.PI) / particles;
+        double inc = maxAngle / particles;
         int steps = wholeCircle ? particles : 1;
+
         for (int i = 0; i < steps; i++) {
             double angle = step * inc;
             Vector v = new Vector();
             v.setX(Math.cos(angle) * radius);
             v.setZ(Math.sin(angle) * radius);
             VectorUtils.rotateVector(v, xRotation, yRotation, zRotation);
+            VectorUtils.rotateAroundAxisX(v, location.getPitch() * MathUtils.degreesToRadians);
+            VectorUtils.rotateAroundAxisY(v, -location.getYaw() * MathUtils.degreesToRadians);
             if (enableRotation) {
                 VectorUtils.rotateVector(v, angularVelocityX * step, angularVelocityY * step, angularVelocityZ * step);
             }
             if (orient) {
-                 v = VectorUtils.rotateVector(v, location);
+                v = VectorUtils.rotateVector(v, location);
             }
-            display(particle, location.clone().add(v), 0, 30);
+            display(particle, location.clone().add(v));
             step++;
+        }
+        if (resetCircle) {
+            step = 0;
         }
     }
 

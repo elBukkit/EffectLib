@@ -1,7 +1,47 @@
 # CHANGELOG
 
-# 6.5
+# 9.5
 
+# 9.4
+
+ - Add maxLength parameter to LineEffect
+ - Add prob(p, x, y) function to equation parser, returns x if a random 0-1 draw < p, else returns y
+
+# 9.3
+
+ - Add EffectManager.ignorePlayer() interface, for turning off particles
+   for specific players.
+
+# 9.2
+
+ - Add toColor properties on effects, used for dust particle color transitions in 1.17
+ - Add arrivalTime property, support 1.17 vibration particles
+
+# 9.1
+
+ - Fix issues with concurrent uses of the same EquationEffect
+ - The Cuboid action will use its padding parameter along with x/y/z length
+ - Make the Modified effect work with CuboidEffect
+
+# 9.0
+
+ - Support (ignore) leading # on hex colors
+ - Add maxAngle and resetCircle parameters to Circle effect, for making partial circles
+ - Merged with Chronoken's fork, we've teamed up:
+   - Fix potential memory leaks with effect tasks
+   - Fix support for block_crack, block_dust and falling_dust particles in 1.13
+   - Fix rotation of several effects: Circle, Donut, Heart
+   - Allow orienting additional effects: Atom
+   - Added Square effect
+   - Optimizations
+   - Added "colors" list to all effects, supporting randomized colors from a set of choices
+   - Added Line effect parameters: zigZagRelativeOffset, subEffectAtEnd
+   - Added subEffectClass and subEffect parameters to all Effects, this lets you play an entire
+     effect in place of single particles for a given effect
+
+# 8.0
+
+ - Namespace has changed to com.elmakers.mine.bukkit, now hosted on Maven Central
  - Add EffectManager.enableStackTraces to turn off stack traces in error messages
  - Add orient parameter to Circle effect
 

@@ -1,15 +1,16 @@
 package de.slikey.effectlib.util;
 
-import de.slikey.effectlib.Effect;
-import de.slikey.effectlib.EffectManager;
-import de.slikey.effectlib.EffectType;
-import de.slikey.effectlib.effect.ColoredImageEffect;
+import java.io.File;
+import java.awt.image.BufferedImage;
+
 import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.util.Vector;
 
-import java.awt.image.BufferedImage;
-import java.io.File;
+import de.slikey.effectlib.Effect;
+import de.slikey.effectlib.EffectType;
+import de.slikey.effectlib.EffectManager;
+import de.slikey.effectlib.effect.ColoredImageEffect;
 
 public abstract class BaseImageEffect extends Effect {
 
@@ -119,8 +120,8 @@ public abstract class BaseImageEffect extends Effect {
 
     @Override
     public void reset() {
-        this.step = 0;
-        this.rotationStep = 0;
+        step = 0;
+        rotationStep = 0;
     }
 
     public void load(String fileName) {
@@ -140,9 +141,8 @@ public abstract class BaseImageEffect extends Effect {
 
     @Override
     public void onRun() {
-        if (images == null && imageLoadCallback != null) {
-            return;
-        }
+        if (images == null && imageLoadCallback != null) return;
+
         if (images == null && fileName != null) {
             load(fileName);
             return;
@@ -158,9 +158,8 @@ public abstract class BaseImageEffect extends Effect {
         }
         stepDelay++;
 
-        if (step >= images.length) {
-            step = 0;
-        }
+        if (step >= images.length) step = 0;
+
         BufferedImage image = images[step];
 
         Location location = getLocation();
@@ -170,12 +169,10 @@ public abstract class BaseImageEffect extends Effect {
                 if (rotation != null) {
                     VectorUtils.rotateVector(v, rotation.getX() * MathUtils.degreesToRadians, rotation.getY() * MathUtils.degreesToRadians, rotation.getZ() * MathUtils.degreesToRadians);
                 }
-                if (orient) {
-                    VectorUtils.rotateAroundAxisY(v, -location.getYaw() * MathUtils.degreesToRadians);
-                }
-                if (orientPitch) {
-                    VectorUtils.rotateVector(v, location);   
-                }
+
+                if (orientPitch) VectorUtils.rotateAroundAxisX(v, Math.toRadians(location.getPitch()));
+                if (orient) VectorUtils.rotateAroundAxisY(v, -location.getYaw() * MathUtils.degreesToRadians);
+
                 if (enableRotation) {
                     double rotX = 0;
                     double rotY = 0;
@@ -212,9 +209,7 @@ public abstract class BaseImageEffect extends Effect {
                 }
 
                 int pixel = image.getRGB(x, y);
-                if (transparency && (pixel >> 24) == 0) {
-                    continue;
-                }
+                if (transparency && (pixel >> 24) == 0) continue;
 
                 display(image, v, location, pixel);
             }
@@ -223,9 +218,9 @@ public abstract class BaseImageEffect extends Effect {
     }
 
     public enum Plane {
-
-        X, Y, Z, XY, XZ, XYZ, YZ;
+        X, Y, Z, XY, XZ, XYZ, YZ
     }
 
     protected abstract void display(BufferedImage image, Vector v, Location location, int pixel);
+
 }

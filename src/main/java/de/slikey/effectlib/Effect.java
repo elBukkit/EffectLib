@@ -1,20 +1,30 @@
 package de.slikey.effectlib;
 
-import de.slikey.effectlib.util.DynamicLocation;
-import de.slikey.effectlib.util.RandomUtils;
+import java.util.List;
+import java.util.ArrayList;
+import java.util.concurrent.ThreadLocalRandom;
 
-import org.bukkit.Particle;
 import org.bukkit.Color;
-import org.bukkit.Location;
 import org.bukkit.Material;
+import org.bukkit.Particle;
+import org.bukkit.Location;
+import org.bukkit.util.Vector;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
-import org.bukkit.util.Vector;
+import org.bukkit.configuration.ConfigurationSection;
 
-import java.util.ArrayList;
-import java.util.List;
+import de.slikey.effectlib.util.ParticleOptions;
+import de.slikey.effectlib.util.RandomUtils;
+import de.slikey.effectlib.util.DynamicLocation;
 
 public abstract class Effect implements Runnable {
+
+    /**
+     * Sub effect
+     * This will play a subeffect on the effect location
+     */
+    private String subEffectClass = null;
+    public ConfigurationSection subEffect = null;
 
     /**
      * Handles the type, the effect is played.
@@ -28,6 +38,22 @@ public abstract class Effect implements Runnable {
      * include SPELL_MOB_AMBIENT, SPELL_MOB and REDSTONE.
      */
     public Color color = null;
+
+    public List<Color> colorList = null;
+    public String colors = null;
+
+    /**
+     * Used for dust particles in 1.17 and up, to make a color transition.
+     */
+    public Color toColor = null;
+
+    public List<Color> toColorList = null;
+    public String toColors = null;
+
+    /**
+     * Used only by the vibration particle in 1.17 and up
+     */
+    public int arrivalTime;
 
     /**
      * This can be used to give particles a set speed when spawned.
@@ -198,12 +224,42 @@ public abstract class Effect implements Runnable {
 
     private boolean done = false;
 
+    private long startTime;
+
     public Effect(EffectManager effectManager) {
-        if (effectManager == null) {
-            throw new IllegalArgumentException("EffectManager cannot be null!");
-        }
+        if (effectManager == null) throw new IllegalArgumentException("EffectManager cannot be null!");
+
         this.effectManager = effectManager;
-        this.visibleRange = effectManager.getParticleRange();
+        visibleRange = effectManager.getParticleRange();
+    }
+
+    protected List<Color> parseColorList(String colors) {
+        List<Color> colorList = new ArrayList<>();
+        String[] args = colors.split(",");
+        if (args.length >= 1) {
+            for (String str : args) {
+                try {
+                    int rgb = Integer.parseInt(str.trim().replace("#", ""), 16);
+                    colorList.add(Color.fromRGB(rgb));
+                } catch (NumberFormatException ignored) {}
+            }
+        }
+        return colorList;
+    }
+
+    protected void initialize() {
+        if (period < 1) period = 1;
+
+        if (colors != null) {
+            colorList = parseColorList(colors);
+        }
+        if (toColors != null) {
+            toColorList = parseColorList(toColors);
+        }
+
+        if (subEffect != null) {
+            subEffectClass = subEffect.getString("subEffectClass");
+        }
     }
 
     public final void cancel() {
@@ -211,11 +267,8 @@ public abstract class Effect implements Runnable {
     }
 
     public final void cancel(boolean callback) {
-        if (callback) {
-            done();
-        } else {
-            done = true;
-        }
+        if (callback) done();
+        else done = true;
     }
 
     public final boolean isDone() {
@@ -237,8 +290,10 @@ public abstract class Effect implements Runnable {
             return;
         }
         if (done) {
+            effectManager.removeEffect(this);
             return;
         }
+
         try {
             if (RandomUtils.checkProbability(probability)) {
                 onRun();
@@ -247,14 +302,11 @@ public abstract class Effect implements Runnable {
             done();
             effectManager.onError(ex);
         }
+
         if (type == EffectType.REPEATING) {
-            if (iterations == -1) {
-                return;
-            }
+            if (iterations == -1) return;
             iterations--;
-            if (iterations < 1) {
-                done();
-            }
+            if (iterations < 1) done();
         } else {
             done();
         }
@@ -265,7 +317,7 @@ public abstract class Effect implements Runnable {
      * state can be reset.
      */
     protected void reset() {
-        this.done = false;
+        done = false;
     }
 
     public void prepare() {
@@ -331,17 +383,12 @@ public abstract class Effect implements Runnable {
      * Set the Location this Effect is centered on.
      */
     public void setDynamicOrigin(DynamicLocation location) {
-        if (location == null) {
-            throw new IllegalArgumentException("Origin Location cannot be null!");
-        }
+        if (location == null) throw new IllegalArgumentException("Origin Location cannot be null!");
         origin = location;
 
-        if (offset != null) {
-            origin.addOffset(offset);
-        }
-        if (relativeOffset != null) {
-            origin.addRelativeOffset(relativeOffset);
-        }
+        if (offset != null) origin.addOffset(offset);
+        if (relativeOffset != null) origin.addRelativeOffset(relativeOffset);
+
         origin.setDirectionOffset(yawOffset, pitchOffset);
         origin.setYaw(yaw);
         origin.setPitch(pitch);
@@ -355,32 +402,22 @@ public abstract class Effect implements Runnable {
      */
     public void setDynamicTarget(DynamicLocation location) {
         target = location;
-        if (target != null && targetOffset != null) {
-            target.addOffset(targetOffset);
-        }
-        if (target != null) {
-            target.setUpdateLocation(updateLocations);
-            target.setUpdateDirection(updateDirections);
-        }
+        if (target != null && targetOffset != null) target.addOffset(targetOffset);
+        if (target == null) return;
+        target.setUpdateLocation(updateLocations);
+        target.setUpdateDirection(updateDirections);
     }
 
     protected final boolean validate() {
         // Check if the origin and target entities are present
-        if (disappearWithOriginEntity && (origin != null && !origin.hasValidEntity())) {
-            return false;
-        }
-        
-        if (disappearWithTargetEntity && (target != null && !target.hasValidEntity())) {
-            return false;
-        }
-        
+        if (disappearWithOriginEntity && (origin != null && !origin.hasValidEntity())) return false;
+        if (disappearWithTargetEntity && (target != null && !target.hasValidEntity())) return false;
+
         // Check for a valid Location
         updateLocation();
         updateTarget();
         Location location = getLocation();
-        if (location == null) {
-            return false;
-        }
+        if (location == null) return false;
         if (autoOrient) {
             Location targetLocation = target == null ? null : target.getLocation();
             if (targetLocation != null) {
@@ -395,28 +432,22 @@ public abstract class Effect implements Runnable {
 
     protected void updateDuration() {
         if (duration != null) {
-            if (period < 1) {
-                period = 1;
-            }
+            if (period < 1) period = 1;
             iterations = duration / period / 50;
         }
         maxIterations = iterations;
     }
 
     protected void updateLocation() {
-        if (origin != null) {
-            origin.update();
-        }
+        if (origin != null) origin.update();
     }
 
     protected void updateTarget() {
-        if (target != null) {
-            target.update();
-        }
+        if (target != null) target.update();
     }
 
     protected void display(Particle effect, Location location) {
-        display(effect, location, this.color);
+        display(effect, location, color);
     }
 
     protected void display(Particle particle, Location location, Color color) {
@@ -424,16 +455,37 @@ public abstract class Effect implements Runnable {
     }
 
     protected void display(Particle particle, Location location, float speed, int amount) {
-        display(particle, location, this.color, speed, amount);
+        display(particle, location, color, speed, amount);
     }
 
     protected void display(Particle particle, Location location, Color color, float speed, int amount) {
-        if (targetPlayers == null && targetPlayer != null) {
-            targetPlayers = new ArrayList<Player>();
-            targetPlayers.add(targetPlayer);
+        display(particle, location, color, toColor, speed, amount);
+    }
+
+    protected void display(Particle particle, Location location, Color color, Color toColor, float speed, int amount) {
+        // display particles only when particleCount is equal or more than 0
+        if (particleCount >= 0) {
+            if (targetPlayers == null && targetPlayer != null) {
+                targetPlayers = new ArrayList<>();
+                targetPlayers.add(targetPlayer);
+            }
+
+            Color currentColor = color;
+            if (colorList != null && !colorList.isEmpty()) {
+                currentColor = colorList.get(ThreadLocalRandom.current().nextInt(colorList.size()));
+            }
+
+            Color currentToColor = toColor;
+            if (toColorList != null && !toColorList.isEmpty()) {
+                currentToColor = toColorList.get(ThreadLocalRandom.current().nextInt(colorList.size()));
+            }
+
+            ParticleOptions options = new ParticleOptions(particleOffsetX, particleOffsetY, particleOffsetZ, speed, amount, particleSize, currentColor, currentToColor, arrivalTime, material, materialData);
+            options.target = target;
+            effectManager.display(particle, options, location, visibleRange, targetPlayers);
         }
-        effectManager.display(particle, location, particleOffsetX, particleOffsetY, particleOffsetZ, speed, amount,
-                particleSize, color, material, materialData, visibleRange, targetPlayers);
+
+        if (subEffectClass != null) effectManager.start(subEffectClass, subEffect, location);
     }
 
     private void done() {
@@ -474,6 +526,23 @@ public abstract class Effect implements Runnable {
         target = new DynamicLocation(location);
     }
 
-    public Player getTargetPlayer() {return this.targetPlayer; }
-    public void setTargetPlayer(Player p){ this.targetPlayer = p; }
+    public Player getTargetPlayer() {
+    	return targetPlayer;
+    }
+
+    public void setTargetPlayer(Player p) {
+    	targetPlayer = p;
+    }
+
+    public long getStartTime() {
+        return startTime;
+    }
+
+    public void setStartTime(long startTime) {
+        this.startTime = startTime;
+    }
+
+    public void reloadParameters() {
+
+    }
 }

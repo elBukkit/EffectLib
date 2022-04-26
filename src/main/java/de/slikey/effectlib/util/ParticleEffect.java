@@ -1,16 +1,16 @@
 package de.slikey.effectlib.util;
 
+import java.util.Map;
+import java.util.List;
 import java.util.Arrays;
 import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 
 import org.bukkit.Color;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Particle;
-import org.bukkit.entity.Player;
 import org.bukkit.util.Vector;
+import org.bukkit.entity.Player;
 
 /**
  * <b>ParticleEffect Enum</b>
@@ -509,7 +509,7 @@ public enum ParticleEffect {
     private final String name;
 
     private static ParticleDisplay display;
-    private static final Map<String, ParticleEffect> NAME_MAP = new HashMap<String, ParticleEffect>();
+    private static final Map<String, ParticleEffect> NAME_MAP = new HashMap<>();
 
     // Initialize map for quick name and id lookup
     static {
@@ -536,9 +536,7 @@ public enum ParticleEffect {
      */
     public static ParticleEffect fromName(String name) {
         for (Map.Entry<String, ParticleEffect> entry : NAME_MAP.entrySet()) {
-            if (!entry.getKey().equalsIgnoreCase(name)) {
-                continue;
-            }
+            if (!entry.getKey().equalsIgnoreCase(name)) continue;
             return entry.getValue();
         }
         return null;
@@ -567,9 +565,7 @@ public enum ParticleEffect {
      * @throws ParticleVersionException If the particle effect is not supported by the server version
      */
     public void display(float offsetX, float offsetY, float offsetZ, float speed, int amount, Location center, double range, List<Player> targetPlayers) throws ParticleVersionException {
-        if (!isSupported()) {
-            throw new ParticleVersionException("The " + this + " particle effect is not supported by your server version.");
-        }
+        if (!isSupported()) throw new ParticleVersionException("The " + this + " particle effect is not supported by your server version.");
 
         display(particle, center, offsetX, offsetY, offsetZ, speed, amount, 1, null, null, (byte)0, range, targetPlayers);
     }
@@ -591,9 +587,8 @@ public enum ParticleEffect {
      * @throws ParticleVersionException If the particle effect is not supported by the server version
      */
     public void display(float offsetX, float offsetY, float offsetZ, float speed, int amount, Location center, List<Player> players) throws ParticleVersionException {
-        if (!isSupported()) {
-            throw new ParticleVersionException("The " + this + " particle effect is not supported by your server version.");
-        }
+        if (!isSupported()) throw new ParticleVersionException("The " + this + " particle effect is not supported by your server version.");
+
         display(particle, center, offsetX, offsetY, offsetZ, speed, amount, 1, null, null, (byte)0, 0, players);
     }
 
@@ -624,9 +619,7 @@ public enum ParticleEffect {
      * @throws ParticleVersionException If the particle effect is not supported by the server version
      */
     public void display(Vector direction, float speed, Location center, double range) throws ParticleVersionException {
-        if (!isSupported()) {
-            throw new ParticleVersionException("The " + this + " particle effect is not supported by your server version.");
-        }
+        if (!isSupported()) throw new ParticleVersionException("The " + this + " particle effect is not supported by your server version.");
 
         display(particle, center, (float)direction.getX(), (float)direction.getY(), (float)direction.getZ(),
                 speed, 1, 1, null, null, (byte)0, range, null);
@@ -642,9 +635,7 @@ public enum ParticleEffect {
      * @throws ParticleVersionException If the particle effect is not supported by the server version
      */
     public void display(Vector direction, float speed, Location center, List<Player> players) throws ParticleVersionException {
-        if (!isSupported()) {
-            throw new ParticleVersionException("The " + this + " particle effect is not supported by your server version.");
-        }
+        if (!isSupported()) throw new ParticleVersionException("The " + this + " particle effect is not supported by your server version.");
 
         display(particle, center, (float)direction.getX(), (float)direction.getY(), (float)direction.getZ(),
                 speed, 1, 1, null, null, (byte)0, 0, players);
@@ -679,9 +670,7 @@ public enum ParticleEffect {
      * @throws ParticleVersionException If the particle effect is not supported by the server version
      */
     public void display(ParticleData data, float offsetX, float offsetY, float offsetZ, float speed, int amount, Location center, double range, List<Player> targetPlayers) throws ParticleVersionException, ParticleDataException {
-        if (!isSupported()) {
-            throw new ParticleVersionException("The " + this + " particle effect is not supported by your server version.");
-        }
+        if (!isSupported()) throw new ParticleVersionException("The " + this + " particle effect is not supported by your server version.");
 
         Material material = null;
         byte materialData = 0;
@@ -711,9 +700,7 @@ public enum ParticleEffect {
      * @throws ParticleVersionException If the particle effect is not supported by the server version
      */
     public void display(ParticleData data, float offsetX, float offsetY, float offsetZ, float speed, int amount, Location center, List<Player> players) throws ParticleVersionException, ParticleDataException {
-        if (!isSupported()) {
-            throw new ParticleVersionException("The " + this + " particle effect is not supported by your server version.");
-        }
+        if (!isSupported()) throw new ParticleVersionException("The " + this + " particle effect is not supported by your server version.");
 
         Material material = null;
         byte materialData = 0;
@@ -752,9 +739,7 @@ public enum ParticleEffect {
      * @throws ParticleVersionException If the particle effect is not supported by the server version
      */
     public void display(ParticleData data, Vector direction, float speed, Location center, double range) throws ParticleVersionException, ParticleDataException {
-        if (!isSupported()) {
-            throw new ParticleVersionException("The " + this + " particle effect is not supported by your server version.");
-        }
+        if (!isSupported()) throw new ParticleVersionException("The " + this + " particle effect is not supported by your server version.");
 
         Material material = null;
         byte materialData = 0;
@@ -777,9 +762,7 @@ public enum ParticleEffect {
      * @throws ParticleVersionException If the particle effect is not supported by the server version
      */
     public void display(ParticleData data, Vector direction, float speed, Location center, List<Player> players) throws ParticleVersionException, ParticleDataException {
-        if (!isSupported()) {
-            throw new ParticleVersionException("The " + this + " particle effect is not supported by your server version.");
-        }
+        if (!isSupported()) throw new ParticleVersionException("The " + this + " particle effect is not supported by your server version.");
 
         Material material = null;
         byte materialData = 0;
@@ -828,7 +811,8 @@ public enum ParticleEffect {
             display = ParticleDisplay.newInstance();
         }
 
-        display.display(particle, center, offsetX, offsetY, offsetZ, speed, amount, size, color, material, materialData, range, targetPlayers);
+        ParticleOptions options = new ParticleOptions(offsetX, offsetY, offsetZ, speed, amount, size, color, material, materialData);
+        display.display(particle, options, center, range, targetPlayers);
     }
 
     /**
@@ -867,6 +851,7 @@ public enum ParticleEffect {
         public byte getData() {
             return data;
         }
+
     }
 
     /**
@@ -891,6 +876,7 @@ public enum ParticleEffect {
         public ItemData(Material material, byte data) {
             super(material, data);
         }
+
     }
 
     /**
@@ -919,6 +905,7 @@ public enum ParticleEffect {
                 throw new IllegalArgumentException("The material is not a block");
             }
         }
+
     }
 
     /**
@@ -942,6 +929,7 @@ public enum ParticleEffect {
         public ParticleDataException(String message) {
             super(message);
         }
+
     }
 
     /**
@@ -965,5 +953,7 @@ public enum ParticleEffect {
         public ParticleVersionException(String message) {
             super(message);
         }
+
     }
+
 }
