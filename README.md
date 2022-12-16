@@ -1,6 +1,7 @@
 EffectLib - Manage your effects the nice way.
 =========
 
+
 You have no idea what a vector or matrix is, but you want to give your users some nice effects with particles? No problem. this library comes with a load of effects for you. It handles rotation, text-parsing, and creation of 3D objects with particles in Minecraft.
 
   - Text-Parsing
