@@ -49,6 +49,16 @@ public class ConeEffect extends Effect {
     public boolean randomize = false;
 
     /**
+     * Solid cone
+     */
+    public boolean solid = false;
+
+    /**
+     * Amount of strands
+     */
+    public int strands = 1;
+
+    /**
      * Current step. Works as counter
      */
     protected int step = 0;
@@ -85,18 +95,22 @@ public class ConeEffect extends Effect {
 
             if (step > particlesCone) step = 0;
             if (randomize && step == 0) rotation = RandomUtils.getRandomAngle();
+            for (int y = 0; y < strands; y++) {
+                angle = step * angularVelocity + rotation + (2 * Math.PI * y / strands);
+                radius = step * radiusGrow;
+                if (solid) {
+                    radius *= RandomUtils.random.nextFloat();
+                }
+                length = step * lengthGrow;
 
-            angle = step * angularVelocity + rotation;
-            radius = step * radiusGrow;
-            length = step * lengthGrow;
+                v = new Vector(Math.cos(angle) * radius, length, Math.sin(angle) * radius);
+                VectorUtils.rotateAroundAxisX(v, (location.getPitch() + 90) * MathUtils.degreesToRadians);
+                VectorUtils.rotateAroundAxisY(v, -location.getYaw() * MathUtils.degreesToRadians);
 
-            v = new Vector(Math.cos(angle) * radius, length, Math.sin(angle) * radius);
-            VectorUtils.rotateAroundAxisX(v, (location.getPitch() + 90) * MathUtils.degreesToRadians);
-            VectorUtils.rotateAroundAxisY(v, -location.getYaw() * MathUtils.degreesToRadians);
-
-            location.add(v);
-            display(particle, location);
-            location.subtract(v);
+                location.add(v);
+                display(particle, location);
+                location.subtract(v);
+            }
             step++;
         }
     }

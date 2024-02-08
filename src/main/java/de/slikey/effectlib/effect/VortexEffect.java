@@ -18,6 +18,16 @@ public class VortexEffect extends Effect {
     public float radius = 2;
 
     /**
+     * Radius grow per iteration (0.00)
+     */
+    public float radiusGrow = 0.00F;
+
+    /**
+     * Initial range of the vortex (0.0)
+     */
+    public float initRange = 0.0F;
+
+    /**
      * Growing per iteration (0.05)
      */
     public float grow = 0.05F;
@@ -70,7 +80,7 @@ public class VortexEffect extends Effect {
         for (int x = 0; x < circles; x++) {
             for (int i = 0; i < helixes; i++) {
                 angle = step * radials + (2 * Math.PI * i / helixes);
-                v = new Vector(Math.cos(angle) * radius, step * grow, Math.sin(angle) * radius);
+                v = new Vector(Math.cos(angle) * (radius + step * radiusGrow), initRange + step * grow, Math.sin(angle) * (radius + step * radiusGrow));
                 VectorUtils.rotateAroundAxisX(v, (location.getPitch() + 90) * MathUtils.degreesToRadians);
                 VectorUtils.rotateAroundAxisY(v, -location.getYaw() * MathUtils.degreesToRadians);
 
