@@ -2,6 +2,7 @@ package de.slikey.effectlib.util;
 
 import java.util.List;
 
+import de.slikey.effectlib.util.versions.ParticleDisplay_20_5;
 import org.bukkit.Color;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
@@ -93,20 +94,26 @@ public abstract class ParticleDisplay {
         ParticleDisplay display;
 
         try {
-            Particle.valueOf("SHRIEK");
-            display = new ParticleDisplay_19();
+            Particle.valueOf("DUST");
+            display = new ParticleDisplay_20_5();
             hasColorTransition = true;
-        } catch (Throwable not19) {
+        } catch (Throwable not20_5) {
             try {
-                Particle.valueOf("VIBRATION");
-                display = new ParticleDisplay_17();
+                Particle.valueOf("SHRIEK");
+                display = new ParticleDisplay_19();
                 hasColorTransition = true;
-            } catch (Throwable not17) {
+            } catch (Throwable not19) {
                 try {
-                    Particle.valueOf("SQUID_INK");
-                    display = new ParticleDisplay_13();
-                } catch (Throwable not13) {
-                    display = new ParticleDisplay_12();
+                    Particle.valueOf("VIBRATION");
+                    display = new ParticleDisplay_17();
+                    hasColorTransition = true;
+                } catch (Throwable not17) {
+                    try {
+                        Particle.valueOf("SQUID_INK");
+                        display = new ParticleDisplay_13();
+                    } catch (Throwable not13) {
+                        display = new ParticleDisplay_12();
+                    }
                 }
             }
         }

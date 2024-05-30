@@ -20,7 +20,7 @@ public abstract class BaseImageEffect extends Effect {
     public String fileName = null;
 
     /**
-     * Whether or not to check for transparent pixels
+     * Whether to check for transparent pixels
      */
     public boolean transparency = false;
 
@@ -109,7 +109,11 @@ public abstract class BaseImageEffect extends Effect {
     public BaseImageEffect(EffectManager effectManager) {
         super(effectManager);
         type = EffectType.REPEATING;
-        particle = Particle.REDSTONE;
+        try {
+            particle = Particle.REDSTONE;
+        } catch (IllegalArgumentException e) {
+            particle = Particle.valueOf("DUST");
+        }
         period = 2;
         iterations = 200;
     }

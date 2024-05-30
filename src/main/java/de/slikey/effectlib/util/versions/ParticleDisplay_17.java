@@ -2,6 +2,7 @@ package de.slikey.effectlib.util.versions;
 
 import java.util.List;
 
+import de.slikey.effectlib.util.ParticleDisplay;
 import org.bukkit.Color;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -12,7 +13,7 @@ import org.bukkit.entity.Player;
 
 import de.slikey.effectlib.util.ParticleOptions;
 
-public class ParticleDisplay_17 extends ParticleDisplay_13 {
+public class ParticleDisplay_17 extends ParticleDisplay {
 
     @Override
     public void display(Particle particle, ParticleOptions options, Location center, double range, List<Player> targetPlayers) {
