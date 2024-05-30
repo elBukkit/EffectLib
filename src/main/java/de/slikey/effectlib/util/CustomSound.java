@@ -12,8 +12,6 @@ import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
 
-import org.apache.commons.lang3.StringUtils;
-
 public class CustomSound {
     private static boolean initializedReflection;
     private static Method player_playCustomSoundMethod;
@@ -36,7 +34,7 @@ public class CustomSound {
      */
     public CustomSound(String key) {
         if (key != null && key.length() > 0) {
-            String[] pieces = StringUtils.split(key, ',');
+            String[] pieces = key.split(",");
             String soundName = pieces[0];
 
             if (soundName.indexOf('.') < 0) {
