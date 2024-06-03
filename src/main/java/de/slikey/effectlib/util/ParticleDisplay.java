@@ -22,6 +22,7 @@ public abstract class ParticleDisplay {
     protected EffectManager manager;
 
     private static boolean hasColorTransition = false;
+    private static boolean hasColorDataType = false;
 
     public abstract void display(Particle particle, ParticleOptions options, Location center, double range, List<Player> targetPlayers);
 
@@ -32,10 +33,9 @@ public abstract class ParticleDisplay {
                 for (final Player player : Bukkit.getOnlinePlayers()) {
                     if (!manager.isVisiblePlayer(player, center, squared)) continue;
 
-                    try {
-                        Particle.valueOf("DUST");
+                    if (hasColorDataType && particle == Particle.valueOf("ENTITY_EFFECT")) {
                         player.spawnParticle(particle, center, options.amount, options.offsetX, options.offsetY, options.offsetZ, options.speed, options.color);
-                    } catch (Throwable not20_5) {
+                    } else {
                         player.spawnParticle(particle, center, options.amount, options.offsetX, options.offsetY, options.offsetZ, options.speed, options.data);
                     }
 
@@ -103,6 +103,7 @@ public abstract class ParticleDisplay {
             Particle.valueOf("DUST");
             display = new ParticleDisplay_20_5();
             hasColorTransition = true;
+            hasColorDataType = true;
         } catch (Throwable not20_5) {
             try {
                 Particle.valueOf("SHRIEK");
