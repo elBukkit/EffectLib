@@ -32,7 +32,13 @@ public abstract class ParticleDisplay {
                 for (final Player player : Bukkit.getOnlinePlayers()) {
                     if (!manager.isVisiblePlayer(player, center, squared)) continue;
 
-                    player.spawnParticle(particle, center, options.amount, options.offsetX, options.offsetY, options.offsetZ, options.speed, options.data);
+                    try {
+                        Particle.valueOf("DUST");
+                        player.spawnParticle(particle, center, options.amount, options.offsetX, options.offsetY, options.offsetZ, options.speed, options.color);
+                    } catch (Throwable not20_5) {
+                        player.spawnParticle(particle, center, options.amount, options.offsetX, options.offsetY, options.offsetZ, options.speed, options.data);
+                    }
+
                     displayFakeBlock(player, center, options);
                 }
                 return;
