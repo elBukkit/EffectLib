@@ -2,6 +2,8 @@
 
 # 10.11
 
+ - Update particle data logic to use data type rather than specific particle types
+
 # 10.10
 
  - Some fixes to backwards-compatibility.

@@ -7,6 +7,7 @@ import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Particle;
 import org.bukkit.Vibration;
+import org.bukkit.block.data.BlockData;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
@@ -26,12 +27,13 @@ public class ParticleDisplay_Modern extends ParticleDisplay {
             return;
         }
 
-        if (particle == ITEM_CRACK) {
+        Class<?> dataType = particle.getDataType();
+        if (dataType != null && dataType.isAssignableFrom(ItemStack.class)) {
             displayItem(particle, options, center, range, targetPlayers);
             return;
         }
 
-        if (particle == BLOCK_DUST || particle == FALLING_DUST) {
+        if (dataType != null && dataType.isAssignableFrom(BlockData.class)) {
             Material material = options.material;
             if (material == null || material.name().contains("AIR")) return;
             try {
@@ -42,19 +44,19 @@ public class ParticleDisplay_Modern extends ParticleDisplay {
             if (options.data == null) return;
         }
 
-        if (particle == REDSTONE) {
+        if (dataType != null && dataType.isAssignableFrom(Particle.DustOptions.class)) {
             // color is required
             if (options.color == null) options.color = Color.RED;
             options.data = new Particle.DustOptions(options.color, options.size);
         }
 
-        if (particle == DUST_COLOR_TRANSITION) {
+        if (dataType != null && dataType.isAssignableFrom(Particle.DustTransition.class)) {
             if (options.color == null) options.color = Color.RED;
             if (options.toColor == null) options.toColor = options.color;
             options.data = new Particle.DustTransition(options.color, options.toColor, options.size);
         }
 
-        if (particle == VIBRATION) {
+        if (dataType != null && dataType.isAssignableFrom(Vibration.class)) {
             if (options.target == null) return;
 
             Vibration.Destination destination;
@@ -70,6 +72,7 @@ public class ParticleDisplay_Modern extends ParticleDisplay {
             options.data = new Vibration(center, destination, options.arrivalTime);
         }
 
+        // These two could use DataType if they were moved out of the modern class and into something more.. modern
         if (particle == SHRIEK) {
             if (options.shriekDelay < 0) options.shriekDelay = 0;
             options.data = options.shriekDelay;
