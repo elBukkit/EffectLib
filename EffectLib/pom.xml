@@ -4,7 +4,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>com.elmakers.mine.bukkit</groupId>
 	<artifactId>EffectLib</artifactId>
-	<version>10.11</version>
+	<version>10.12-SNAPSHOT</version>
 
 	<name>EffectLib</name>
 	<description>A library for Bukkit plugins to make complicated particle effects</description>
@@ -83,7 +83,7 @@
 		<dependency>
 			<groupId>com.elmakers.mine.bukkit.compatibility</groupId>
 			<artifactId>EffectLib-Compatibility-main</artifactId>
-			<version>10.11</version>
+			<version>10.12-SNAPSHOT</version>
 			<scope>compile</scope>
 		</dependency>
 	</dependencies>

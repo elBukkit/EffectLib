@@ -4,14 +4,14 @@
 	<parent>
 		<groupId>com.elmakers.mine.bukkit</groupId>
 		<artifactId>EffectLib-parent</artifactId>
-		<version>10.11</version>
+		<version>10.12-SNAPSHOT</version>
 		<relativePath>../pom.xml</relativePath>
 	</parent>
 
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>com.elmakers.mine.bukkit.compatibility</groupId>
 	<artifactId>EffectLib-Compatibility</artifactId>
-	<version>10.11</version>
+	<version>10.12-SNAPSHOT</version>
 
 	<name>EffectLib-Compatibility</name>
 	<description>The compatibility layer for EffectLib</description>
