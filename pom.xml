@@ -4,7 +4,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>com.elmakers.mine.bukkit</groupId>
 	<artifactId>EffectLib-parent</artifactId>
-	<version>10.11-SNAPSHOT</version>
+	<version>10.11</version>
 
 	<name>EffectLib-parent</name>
 	<description>A multi-module container for EffectLib compatibility</description>
