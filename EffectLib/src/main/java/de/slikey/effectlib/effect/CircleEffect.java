@@ -89,6 +89,7 @@ public class CircleEffect extends Effect {
 
     @Override
     public void reset() {
+        super.reset();
         step = 0;
     }
 
