@@ -56,6 +56,11 @@ public class ParticleDisplay_Modern extends ParticleDisplay {
             options.data = new Particle.DustTransition(options.color, options.toColor, options.size);
         }
 
+        if (dataType != null && dataType.isAssignableFrom(Color.class)) {
+            if (options.color == null) options.color = Color.RED;
+            options.data = options.color;
+        }
+
         if (dataType != null && dataType.isAssignableFrom(Vibration.class)) {
             if (options.target == null) return;
 
