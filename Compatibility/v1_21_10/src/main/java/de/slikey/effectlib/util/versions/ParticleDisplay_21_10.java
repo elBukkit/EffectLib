@@ -20,13 +20,7 @@ public class ParticleDisplay_21_10 extends ParticleDisplay_Modern {
 				double squared = range * range;
 				for (final Player player : Bukkit.getOnlinePlayers()) {
 					if (!manager.isVisiblePlayer(player, center, squared)) continue;
-
-					if (hasColorDataType && options.color != null) {
-						player.spawnParticle(particle, center, options.amount, options.offsetX, options.offsetY, options.offsetZ, options.speed, options.color, forceShow);
-					} else {
-						player.spawnParticle(particle, center, options.amount, options.offsetX, options.offsetY, options.offsetZ, options.speed, options.data, forceShow);
-					}
-
+					player.spawnParticle(particle, center, options.amount, options.offsetX, options.offsetY, options.offsetZ, options.speed, options.data, forceShow);
 					displayFakeBlock(player, center, options);
 				}
 				return;
