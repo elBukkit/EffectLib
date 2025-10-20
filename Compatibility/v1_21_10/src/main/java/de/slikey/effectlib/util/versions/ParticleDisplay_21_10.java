@@ -11,7 +11,7 @@ import org.bukkit.entity.Player;
 
 import de.slikey.effectlib.util.ParticleOptions;
 
-public class ParticleDisplay_21_4 extends ParticleDisplay_Modern {
+public class ParticleDisplay_21_10 extends ParticleDisplay_Modern {
 
 	protected void spawnParticle(Particle particle, ParticleOptions options, Location center, double range, List<Player> targetPlayers) {
 		try {
@@ -57,5 +57,19 @@ public class ParticleDisplay_21_4 extends ParticleDisplay_Modern {
 				player.sendBlockChange(b, b.getBlock().getBlockData());
 			}
 		}, options.blockDuration);
+	}
+
+
+	public boolean addParticleData(Particle particle, ParticleOptions options, Location center) {
+		Class<?> dataType = particle.getDataType();
+		if (dataType.isAssignableFrom(Particle.Spell.class)) {
+			Color color = options.color;
+			if (color == null) {
+				color = Color.WHITE;
+			}
+			options.data = new Particle.Spell(color, options.size);
+		}
+
+		return super.addParticleData(particle, options, center);
 	}
 }

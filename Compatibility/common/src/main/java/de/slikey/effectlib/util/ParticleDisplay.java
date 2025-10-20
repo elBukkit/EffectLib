@@ -61,11 +61,6 @@ public abstract class ParticleDisplay {
             return;
         }
 
-        if (particle == ITEM_CRACK) {
-            displayItem(particle, options, center, range, targetPlayers);
-            return;
-        }
-
         spawnParticle(particle, options, center, range, targetPlayers);
     }
 

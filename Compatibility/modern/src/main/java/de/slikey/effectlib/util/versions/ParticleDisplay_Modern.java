@@ -26,78 +26,87 @@ public class ParticleDisplay_Modern extends ParticleDisplay {
             displayLegacyColored(particle, options, center, range, targetPlayers);
             return;
         }
+        if (!addParticleData(particle, options, center)) {
+            return;
+        }
+        spawnParticle(particle, options, center, range, targetPlayers);
+    }
 
+    public boolean addParticleData(Particle particle, ParticleOptions options, Location center) {
         Class<?> dataType = particle.getDataType();
         if (dataType != null && dataType.isAssignableFrom(ItemStack.class)) {
-            displayItem(particle, options, center, range, targetPlayers);
-            return;
+            Material material = options.material;
+            if (material == null || material == Material.AIR) {
+                return false;
+            }
+            ItemStack item = new ItemStack(material);
+            item.setDurability(options.materialData);
+            options.data = item;
+            return true;
         }
 
         if (dataType != null && dataType.isAssignableFrom(BlockData.class)) {
             Material material = options.material;
-            if (material == null || material.name().contains("AIR")) return;
+            if (material == null || material.name().contains("AIR")) {
+                return false;
+            }
             try {
                 options.data = material.createBlockData();
             } catch (Exception ex) {
                 manager.onError("Error creating block data for " + material, ex);
             }
-            if (options.data == null) return;
+            return options.data != null;
         }
 
         if (dataType != null && dataType.isAssignableFrom(Particle.DustOptions.class)) {
             // color is required
             if (options.color == null) options.color = Color.RED;
             options.data = new Particle.DustOptions(options.color, options.size);
+            return true;
         }
 
         if (dataType != null && dataType.isAssignableFrom(Particle.DustTransition.class)) {
             if (options.color == null) options.color = Color.RED;
             if (options.toColor == null) options.toColor = options.color;
             options.data = new Particle.DustTransition(options.color, options.toColor, options.size);
+            return true;
         }
 
         if (dataType != null && dataType.isAssignableFrom(Color.class)) {
             if (options.color == null) options.color = Color.RED;
             options.data = options.color;
+            return true;
         }
 
         if (dataType != null && dataType.isAssignableFrom(Vibration.class)) {
-            if (options.target == null) return;
+            if (options.target == null) return false;
 
             Vibration.Destination destination;
             Entity targetEntity = options.target.getEntity();
             if (targetEntity != null) destination = new Vibration.Destination.EntityDestination(targetEntity);
             else {
                 Location targetLocation = options.target.getLocation();
-                if (targetLocation == null) return;
+                if (targetLocation == null) return false;
 
                 destination = new Vibration.Destination.BlockDestination(targetLocation);
             }
 
             options.data = new Vibration(center, destination, options.arrivalTime);
+            return true;
         }
 
-        // These two could use DataType if they were moved out of the modern class and into something more.. modern
+        // These two can't use datatype because they are just ints and floats
         if (particle == SHRIEK) {
             if (options.shriekDelay < 0) options.shriekDelay = 0;
             options.data = options.shriekDelay;
+            return true;
         }
 
         if (particle == SCULK_CHARGE) {
             options.data = options.sculkChargeRotation;
+            return true;
         }
 
-        spawnParticle(particle, options, center, range, targetPlayers);
-    }
-
-    @SuppressWarnings({"deprecation"})
-    protected void displayItem(Particle particle, ParticleOptions options, Location center, double range, List<Player> targetPlayers) {
-        Material material = options.material;
-        if (material == null || material.isAir()) return;
-
-        ItemStack item = new ItemStack(material);
-        item.setDurability(options.materialData);
-        options.data = item;
-        spawnParticle(particle, options, center, range, targetPlayers);
+        return true;
     }
 }

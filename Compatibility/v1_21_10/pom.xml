@@ -8,7 +8,7 @@
         <version>10.12-SNAPSHOT</version>
     </parent>
 
-    <artifactId>EffectLib-Compatibility-v1_21_4</artifactId>
+    <artifactId>EffectLib-Compatibility-v1_21_10</artifactId>
 
     <dependencies>
         <dependency>

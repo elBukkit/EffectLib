@@ -2,6 +2,8 @@
 
 # 10.12
 
+ - Add support for 1.21.5 spell data types, size parameter available for spell particles
+
 # 10.11
 
  - Update particle data logic to use data type rather than specific particle types
