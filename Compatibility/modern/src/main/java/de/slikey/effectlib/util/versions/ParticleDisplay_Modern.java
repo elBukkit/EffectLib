@@ -22,7 +22,7 @@ public class ParticleDisplay_Modern extends ParticleDisplay {
 
         // Legacy colorizeable particles
         // 1.20.5 has removed Particle#SPELL_MOB_AMBIENT and SPELL_MOB is now ENTITY_EFFECT (handled by ParticleUtil)
-        if (options.color != null && particle == SPELL_MOB) {
+        if (options.color != null && particle == SPELL_MOB && !hasColorDataType) {
             displayLegacyColored(particle, options, center, range, targetPlayers);
             return;
         }
