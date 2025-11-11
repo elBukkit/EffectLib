@@ -95,7 +95,7 @@ public class ParticleDisplay_Modern extends ParticleDisplay {
             return true;
         }
 
-        // These two can't use datatype because they are just ints and floats
+        // These can't use datatype because they are just ints and floats
         if (particle == SHRIEK) {
             if (options.shriekDelay < 0) options.shriekDelay = 0;
             options.data = options.shriekDelay;
@@ -104,6 +104,11 @@ public class ParticleDisplay_Modern extends ParticleDisplay {
 
         if (particle == SCULK_CHARGE) {
             options.data = options.sculkChargeRotation;
+            return true;
+        }
+
+        if (particle == Particle.DRAGON_BREATH) {
+            options.data = 0.0;
             return true;
         }
 
