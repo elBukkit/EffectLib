@@ -33,7 +33,7 @@ public class ParticleDisplay_21_10 extends ParticleDisplay_Modern {
 			}
 
 		} catch (Exception ex) {
-			if (manager != null) manager.onError(ex);
+			if (manager != null) manager.onError("Particle " + particle.getKeyOrNull() + " data type " + particle.getDataType(), ex);
 		}
 	}
 
