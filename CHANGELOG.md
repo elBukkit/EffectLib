@@ -1,5 +1,9 @@
 # CHANGELOG
 
+# 11.0
+
+ - Backwards-compatibility fixes, back to 1.12
+
 # 10.12
 
  - Add support for 1.21.5 spell data types, size parameter available for spell particles

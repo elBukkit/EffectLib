@@ -6,6 +6,9 @@ import org.bukkit.entity.Player;
 
 import de.slikey.effectlib.util.versions.ParticleDisplay_12;
 import de.slikey.effectlib.util.versions.ParticleDisplay_13;
+import de.slikey.effectlib.util.versions.ParticleDisplay_17;
+import de.slikey.effectlib.util.versions.ParticleDisplay_19;
+import de.slikey.effectlib.util.versions.ParticleDisplay_20_5;
 import de.slikey.effectlib.util.versions.ParticleDisplay_21_4;
 import de.slikey.effectlib.util.versions.ParticleDisplay_21_10;
 
@@ -31,18 +34,18 @@ public class ParticleDisplayFactory {
                 // TODO: This could all be cleaned up a bit.
                 try {
                     Particle.valueOf("DUST");
-                    display = new ParticleDisplay_13();
+                    display = new ParticleDisplay_20_5();
                     hasColorTransition = true;
                     hasColorDataType = true;
                 } catch (Throwable not20_5) {
                     try {
                         Particle.valueOf("SHRIEK");
-                        display = new ParticleDisplay_13();
+                        display = new ParticleDisplay_19();
                         hasColorTransition = true;
                     } catch (Throwable not19) {
                         try {
                             Particle.valueOf("VIBRATION");
-                            display = new ParticleDisplay_13();
+                            display = new ParticleDisplay_17();
                             hasColorTransition = true;
                         } catch (Throwable not17) {
                             try {

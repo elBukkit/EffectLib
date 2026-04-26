@@ -8,13 +8,13 @@
         <version>11.0-SNAPSHOT</version>
     </parent>
 
-    <artifactId>EffectLib-Compatibility-modern</artifactId>
+    <artifactId>EffectLib-Compatibility-v1_19</artifactId>
 
     <dependencies>
         <dependency>
             <groupId>org.spigotmc</groupId>
             <artifactId>spigot-api</artifactId>
-            <version>1.17-R0.1-SNAPSHOT</version>
+            <version>1.19-R0.1-SNAPSHOT</version>
             <scope>provided</scope>
         </dependency>
         <dependency>
