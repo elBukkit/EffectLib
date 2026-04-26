@@ -54,13 +54,6 @@ public abstract class ParticleDisplay {
 
     public void display(Particle particle, ParticleOptions options, Location center, double range, List<Player> targetPlayers) {
         initializeConstants();
-
-        // Legacy colorizeable particles
-        if (options.color != null && particle == SPELL_MOB) {
-            displayLegacyColored(particle, options, center, range, targetPlayers);
-            return;
-        }
-
         spawnParticle(particle, options, center, range, targetPlayers);
     }
 
@@ -70,13 +63,7 @@ public abstract class ParticleDisplay {
                 double squared = range * range;
                 for (final Player player : Bukkit.getOnlinePlayers()) {
                     if (!manager.isVisiblePlayer(player, center, squared)) continue;
-
-                    if (hasColorDataType && particle == SPELL_MOB) {
-                        player.spawnParticle(particle, center, options.amount, options.offsetX, options.offsetY, options.offsetZ, options.speed, options.color == null ? Color.WHITE : options.color);
-                    } else {
-                        player.spawnParticle(particle, center, options.amount, options.offsetX, options.offsetY, options.offsetZ, options.speed, options.data);
-                    }
-
+                    player.spawnParticle(particle, center, options.amount, options.offsetX, options.offsetY, options.offsetZ, options.speed, options.data);
                     displayFakeBlock(player, center, options);
                 }
                 return;
