@@ -3,6 +3,7 @@ package de.slikey.effectlib.effect;
 import org.bukkit.Color;
 import org.bukkit.Sound;
 import org.bukkit.Location;
+import org.bukkit.plugin.Plugin;
 import org.bukkit.util.Vector;
 import org.bukkit.FireworkEffect;
 import org.bukkit.entity.Firework;
@@ -62,7 +63,6 @@ public class BigBangEffect extends Effect {
     @Override
     public void onRun() {
         Location location = getLocation();
-        Vector v;
 
         if (location == null || location.getWorld() == null) {
             cancel();
@@ -77,13 +77,17 @@ public class BigBangEffect extends Effect {
             firework = b.build();
         }
 
-        for (int i = 0; i < explosions; i++) {
-            v = RandomUtils.getRandomVector().multiply(radius);
-            detonate(location, v);
-            if (soundInterval != 0 && step % soundInterval == 0) {
-                location.getWorld().playSound(location, sound, soundVolume, soundPitch);
+        // Sounds must be played in main thread
+        Plugin owningPlugin = effectManager.getOwningPlugin();
+        owningPlugin.getServer().getScheduler().runTask(owningPlugin, () -> {
+            for (int i = 0; i < explosions; i++) {
+                Vector v = RandomUtils.getRandomVector().multiply(radius);
+                detonate(location, v);
+                if (soundInterval != 0 && step % soundInterval == 0) {
+                    location.getWorld().playSound(location, sound, soundVolume, soundPitch);
+                }
             }
-        }
+        });
         step++;
     }
 

@@ -3,6 +3,7 @@
 # 11.0
 
  - Backwards-compatibility fixes, back to 1.12
+ - Fix ExplodeEffect and BigBangEffect playing sounds asynchronously, which is no longer allowed
 
 # 10.12
 

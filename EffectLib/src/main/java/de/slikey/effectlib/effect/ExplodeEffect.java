@@ -3,6 +3,7 @@ package de.slikey.effectlib.effect;
 import org.bukkit.Sound;
 import org.bukkit.Location;
 import org.bukkit.Particle;
+import org.bukkit.plugin.Plugin;
 
 import de.slikey.effectlib.Effect;
 import de.slikey.effectlib.EffectType;
@@ -36,7 +37,11 @@ public class ExplodeEffect extends Effect {
             return;
         }
 
-        location.getWorld().playSound(location, sound, 4.0F, (1.0F + (RandomUtils.random.nextFloat() - RandomUtils.random.nextFloat()) * 0.2F) * 0.7F);
+        // Play sound in main thread
+        Plugin owningPlugin = effectManager.getOwningPlugin();
+        owningPlugin.getServer().getScheduler().runTask(owningPlugin, () -> {
+            location.getWorld().playSound(location, sound, 4.0F, (1.0F + (RandomUtils.random.nextFloat() - RandomUtils.random.nextFloat()) * 0.2F) * 0.7F);
+        });
         display(particle1, location);
         display(particle2, location);
     }
