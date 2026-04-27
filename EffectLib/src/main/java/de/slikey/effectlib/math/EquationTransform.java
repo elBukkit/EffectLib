@@ -150,6 +150,10 @@ public class EquationTransform implements Transform, VariableProvider {
         inputVariables.add(key);
     }
 
+    public void addVariables(Collection<String> keys) {
+        inputVariables.addAll(keys);
+    }
+
     public void setVariable(String key, double value) {
         if (expression != null) expression.setVariable(key, value);
     }
