@@ -4,6 +4,7 @@
 
  - Backwards-compatibility fixes, back to 1.12
  - Fix ExplodeEffect and BigBangEffect playing sounds asynchronously, which is no longer allowed
+ - Fall back to default particles and print an error when failing to parse a particle name
 
 # 10.12
 

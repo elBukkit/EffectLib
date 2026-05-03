@@ -512,7 +512,12 @@ public class EffectManager implements Disposable, ParticleEffectManager {
                     if (!getDisplay().hasColorTransition() && value.equalsIgnoreCase("DUST_COLOR_TRANSITION")) {
                         value = "REDSTONE";
                     }
-                    field.set(effect, ParticleUtil.getParticle(value));
+                    Particle particle = ParticleUtil.getParticle(value);
+                    if (particle == null) {
+                        onError("Unknown particle: " + value + " in " + logContext);
+                    } else {
+                        field.set(effect, particle);
+                    }
                 }
             } else if (field.getType().isEnum()) {
                 Class<Enum> enumType = (Class<Enum>) field.getType();
