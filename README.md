@@ -24,17 +24,14 @@ for a full working example.
 It is recommended to shade this plugin into yours. This way, users of your plugin do not need to install EffectLib separately.
 
 This easy to do with Maven. First, add the elMakers repository:
+Note: older versions of EffectLib can be found in Maven Central, but can no longer be updated due to the Spigot API
+not being in Maven Central.
 
 ```
     <repositories>
-      <repository>
-          <id>Maven Central</id>
-          <url>https://repo1.maven.org/maven2/</url>
-      </repository>
-<!-- Use this repository ONLY if you need snapshot builds -->
         <repository>
             <id>elMakers</id>
-            <url>http://maven.elmakers.com/repository/</url>
+            <url>https://maven.elmakers.com/repository/</url>
         </repository>
     </repositories>
 ```
@@ -45,7 +42,7 @@ Then, add the EffectLib dependency:
         <dependency>
             <groupId>com.elmakers.mine.bukkit</groupId>
             <artifactId>EffectLib</artifactId>
-            <version>10.2</version>
+            <version>11.0</version>
             <scope>compile</scope>
         </dependency>
 
