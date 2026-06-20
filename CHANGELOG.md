@@ -1,5 +1,7 @@
 # CHANGELOG
 
+# 11.1
+
 # 11.0
 
  - Backwards-compatibility fixes, back to 1.12
