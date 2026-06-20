@@ -26,6 +26,11 @@ public class ColorUtils {
         }
     }
 
+    public static Color parse(ConfigurationSection configuration, String key, Color defaultValue) {
+        Color color = parse(configuration, key);
+        return color == null ? defaultValue : color;
+    }
+
     public static Color parse(String value) {
         try {
             return instance.parser.parse(value);
@@ -35,8 +40,18 @@ public class ColorUtils {
         }
     }
 
+    public static Color parse(String value, Color defaultValue) {
+        Color color = parse(value);
+        return color == null ? defaultValue : color;
+    }
+
     public static Color fromARGB(int alpha, int red, int green, int blue) {
         return instance.parser.fromARGB(alpha, red, green, blue);
+    }
+
+    public static Color fromARGB(int alpha, int red, int green, int blue, Color defaultValue) {
+        Color color = fromARGB(alpha, red, green, blue);
+        return color == null ? defaultValue : color;
     }
 
     public static int getAlpha(Color color) {

@@ -23,7 +23,7 @@ public class ColorParser_20_5 extends ColorParser {
 
     @Override
     public Color parse(String value) {
-        if (value == null) {
+        if (value == null || value.isEmpty()) {
             return null;
         }
         Color named = getColorByName(value);

@@ -47,7 +47,7 @@ public class ColorParser {
     }
 
     public Color parse(String value) {
-        if (value == null) return null;
+        if (value == null || value.isEmpty()) return null;
         Color named = getColorByName(value);
         if (named != null) {
             return named;
