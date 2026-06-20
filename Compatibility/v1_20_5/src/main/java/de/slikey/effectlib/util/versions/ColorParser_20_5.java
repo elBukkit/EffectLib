@@ -57,7 +57,7 @@ public class ColorParser_20_5 extends ColorParser {
         } else {
             if (value.startsWith("#")) value = value.substring(1);
             if (value.length() == 6) value = "FF" + value;
-            rgba = Integer.parseInt(value, 16);
+            rgba = (int)Long.parseLong(value, 16);
         }
         return Color.fromARGB(rgba);
     }
