@@ -1,5 +1,7 @@
 package de.slikey.effectlib.util;
 
+import java.util.logging.Logger;
+
 import org.bukkit.Color;
 import org.bukkit.configuration.ConfigurationSection;
 
@@ -7,18 +9,30 @@ import de.slikey.effectlib.util.versions.ColorParser_20_5;
 
 public class ColorUtils {
     private static ColorUtils instance;
+    private static Logger logger;
     private final ColorParser parser;
 
-    public static void initialize() {
+    public static void initialize(Logger log) {
+        logger = logger;
         instance = new ColorUtils();
     }
 
     public static Color parse(ConfigurationSection configuration, String key) {
-        return instance.parser.parse(configuration, key);
+        try {
+            return instance.parser.parse(configuration, key);
+        } catch (Exception ex) {
+            logger.warning("Invalid color configuration: " + configuration.get(key));
+            return null;
+        }
     }
 
     public static Color parse(String value) {
-        return instance.parser.parse(value);
+        try {
+            return instance.parser.parse(value);
+        } catch (Exception ex) {
+            logger.warning("Invalid color string: " + value);
+            return null;
+        }
     }
 
     public static Color fromARGB(int alpha, int red, int green, int blue) {

@@ -67,7 +67,7 @@ public class EffectManager implements Disposable, ParticleEffectManager {
         if (owningPlugin == null) {
             throw new IllegalArgumentException("EffectManager must be given a valid owning plugin");
         }
-        ColorUtils.initialize();
+        ColorUtils.initialize(logger);
         this.owningPlugin = owningPlugin;
         this.logger = logger;
 
