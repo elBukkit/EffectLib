@@ -48,6 +48,7 @@ public class ColorParser {
 
     public Color parse(String value) {
         if (value == null || value.isEmpty()) return null;
+        if (value.startsWith("#")) value = value.substring(1);
         Color named = getColorByName(value);
         if (named != null) {
             return named;
@@ -66,7 +67,6 @@ public class ColorParser {
                 int blue = Integer.parseInt(pieces[0]);
                 return Color.fromRGB(red, green, blue);
             } else {
-                if (value.startsWith("#")) value = value.substring(1);
                 rgb = Integer.parseInt(value, 16);
             }
         }

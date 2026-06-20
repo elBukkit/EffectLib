@@ -26,6 +26,7 @@ public class ColorParser_20_5 extends ColorParser {
         if (value == null || value.isEmpty()) {
             return null;
         }
+        if (value.startsWith("#")) value = value.substring(1);
         Color named = getColorByName(value);
         if (named != null) {
             return named;
@@ -55,7 +56,6 @@ public class ColorParser_20_5 extends ColorParser {
             }
             return Color.fromARGB(alpha, red, green, blue);
         } else {
-            if (value.startsWith("#")) value = value.substring(1);
             if (value.length() == 6) value = "FF" + value;
             rgba = (int)Long.parseLong(value, 16);
         }

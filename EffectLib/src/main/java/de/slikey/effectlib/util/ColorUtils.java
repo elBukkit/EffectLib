@@ -21,7 +21,7 @@ public class ColorUtils {
         try {
             return instance.parser.parse(configuration, key);
         } catch (Exception ex) {
-            logger.warning("Invalid color configuration: " + configuration.get(key));
+            logger.warning("Invalid color configuration: " + configuration.get(key) + ": " + ex.getMessage());
             return null;
         }
     }
@@ -35,7 +35,7 @@ public class ColorUtils {
         try {
             return instance.parser.parse(value);
         } catch (Exception ex) {
-            logger.warning("Invalid color string: " + value);
+            logger.warning("Invalid color string: " + value + ": " + ex.getMessage());
             return null;
         }
     }
