@@ -67,6 +67,9 @@ public class ColorParser {
                 int blue = Integer.parseInt(pieces[0]);
                 return Color.fromRGB(red, green, blue);
             } else {
+                if (value.length() > 6) {
+                    value = value.substring(0, 6);
+                }
                 rgb = Integer.parseInt(value, 16);
             }
         }
