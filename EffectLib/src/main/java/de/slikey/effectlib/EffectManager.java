@@ -67,6 +67,7 @@ public class EffectManager implements Disposable, ParticleEffectManager {
         if (owningPlugin == null) {
             throw new IllegalArgumentException("EffectManager must be given a valid owning plugin");
         }
+        ColorUtils.initialize();
         this.owningPlugin = owningPlugin;
         this.logger = logger;
 
@@ -451,19 +452,9 @@ public class EffectManager implements Disposable, ParticleEffectManager {
                 String value = fieldSection.getString(fieldKey);
                 field.set(effect, value);
             } else if (field.getType().equals(Color.class)) {
-                String value = fieldSection.getString(fieldKey);
-                if (value != null) {
-                    int rgb;
-                    if (value.equalsIgnoreCase("random")) {
-                        byte red = (byte) (Math.random() * 255);
-                        byte green = (byte) (Math.random() * 255);
-                        byte blue = (byte) (Math.random() * 255);
-                        rgb = (red << 16) | (green << 8) | blue;
-                    } else {
-                        if (value.startsWith("#")) value = value.substring(1);
-                        rgb = Integer.parseInt(value, 16);
-                    }
-                    field.set(effect, Color.fromRGB(rgb));
+                Color color = ColorUtils.parse(fieldSection, fieldKey);
+                if (color != null) {
+                    field.set(effect, color);
                 }
             } else if (Map.class.isAssignableFrom(field.getType()) && section.isConfigurationSection(key)) {
                 Map<String, Object> map = (Map<String, Object>) field.get(effect);

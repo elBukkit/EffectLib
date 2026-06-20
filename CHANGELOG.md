@@ -2,6 +2,8 @@
 
 # 11.1
 
+ - Add support for ARGB colors, and also using sections (red/green/blue/alpha) to configure colors
+
 # 11.0
 
  - Backwards-compatibility fixes, back to 1.12
