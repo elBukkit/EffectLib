@@ -21,6 +21,10 @@ public class ColorUtils {
         return instance.parser.parse(value);
     }
 
+    public static Color fromARGB(int alpha, int red, int green, int blue) {
+        return instance.parser.fromARGB(alpha, red, green, blue);
+    }
+
     private ColorUtils() {
         boolean hasAlpha = true;
         try {

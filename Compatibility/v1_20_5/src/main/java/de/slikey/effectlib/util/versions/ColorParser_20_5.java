@@ -47,4 +47,9 @@ public class ColorParser_20_5 extends ColorParser {
         }
         return Color.fromARGB(rgba);
     }
+
+    @Override
+    public Color fromARGB(int alpha, int red, int green, int blue) {
+        return Color.fromARGB(alpha, red, green, blue);
+    }
 }

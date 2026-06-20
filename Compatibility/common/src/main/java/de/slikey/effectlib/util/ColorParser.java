@@ -30,4 +30,8 @@ public class ColorParser {
         }
         return Color.fromRGB(rgb);
     }
+
+    public Color fromARGB(int alpha, int red, int green, int blue) {
+        return Color.fromRGB(red, green, blue);
+    }
 }
