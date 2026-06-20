@@ -16,30 +16,35 @@ public class ColorParser_20_5 extends ColorParser {
             int blue = colorSection.getInt("blue");
             int alpha = colorSection.getInt("alpha", 255);
             return Color.fromARGB(alpha, red, green, blue);
-        } else {
-            String value = configuration.getString(key);
-            if (value != null) {
-                int rgba;
-                if (value.equalsIgnoreCase("random")) {
-                    byte red = (byte) (Math.random() * 255);
-                    byte green = (byte) (Math.random() * 255);
-                    byte blue = (byte) (Math.random() * 255);
-                    byte alpha = (byte) 255;
-                    rgba = (alpha << 24) | (red << 16) | (green << 8) | blue;
-                } else if (value.equalsIgnoreCase("arandom")) {
-                    byte red = (byte) (Math.random() * 255);
-                    byte green = (byte) (Math.random() * 255);
-                    byte blue = (byte) (Math.random() * 255);
-                    byte alpha = (byte) (Math.random() * 255);
-                    rgba = (alpha << 24) | (red << 16) | (green << 8) | blue;
-                } else {
-                    if (value.startsWith("#")) value = value.substring(1);
-                    if (value.length() == 6) value = "FF" + value;
-                    rgba = Integer.parseInt(value, 16);
-                }
-                return Color.fromARGB(rgba);
-            }
         }
-        return null;
+
+        return parse(configuration.getString(key));
+    }
+
+    @Override
+    public Color parse(String value) {
+        if (value == null) {
+            return null;
+        }
+
+        int rgba;
+        if (value.equalsIgnoreCase("random")) {
+            byte red = (byte) (Math.random() * 255);
+            byte green = (byte) (Math.random() * 255);
+            byte blue = (byte) (Math.random() * 255);
+            byte alpha = (byte) 255;
+            rgba = (alpha << 24) | (red << 16) | (green << 8) | blue;
+        } else if (value.equalsIgnoreCase("arandom")) {
+            byte red = (byte) (Math.random() * 255);
+            byte green = (byte) (Math.random() * 255);
+            byte blue = (byte) (Math.random() * 255);
+            byte alpha = (byte) (Math.random() * 255);
+            rgba = (alpha << 24) | (red << 16) | (green << 8) | blue;
+        } else {
+            if (value.startsWith("#")) value = value.substring(1);
+            if (value.length() == 6) value = "FF" + value;
+            rgba = Integer.parseInt(value, 16);
+        }
+        return Color.fromARGB(rgba);
     }
 }

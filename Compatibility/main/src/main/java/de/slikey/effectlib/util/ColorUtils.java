@@ -17,6 +17,10 @@ public class ColorUtils {
         return instance.parser.parse(configuration, key);
     }
 
+    public static Color parse(String value) {
+        return instance.parser.parse(value);
+    }
+
     private ColorUtils() {
         boolean hasAlpha = true;
         try {
