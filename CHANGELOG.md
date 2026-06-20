@@ -3,6 +3,7 @@
 # 11.1
 
  - Add support for ARGB colors, and also using sections (red/green/blue/alpha) to configure colors
+ - Named colors such as red, green, etc can now be used in color configs
 
 # 11.0
 

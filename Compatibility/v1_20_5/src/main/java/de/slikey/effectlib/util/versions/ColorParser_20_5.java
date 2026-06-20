@@ -26,6 +26,10 @@ public class ColorParser_20_5 extends ColorParser {
         if (value == null) {
             return null;
         }
+        Color named = getColorByName(value);
+        if (named != null) {
+            return named;
+        }
 
         int rgba;
         if (value.equalsIgnoreCase("random")) {
@@ -40,6 +44,16 @@ public class ColorParser_20_5 extends ColorParser {
             byte blue = (byte) (Math.random() * 255);
             byte alpha = (byte) (Math.random() * 255);
             rgba = (alpha << 24) | (red << 16) | (green << 8) | blue;
+        } else if (value.contains(",")) {
+            String[] pieces = value.split(",");
+            int red = Integer.parseInt(pieces[0]);
+            int green = Integer.parseInt(pieces[0]);
+            int blue = Integer.parseInt(pieces[0]);
+            int alpha = 255;
+            if (pieces.length > 3) {
+                alpha = Integer.parseInt(pieces[0]);
+            }
+            return Color.fromARGB(alpha, red, green, blue);
         } else {
             if (value.startsWith("#")) value = value.substring(1);
             if (value.length() == 6) value = "FF" + value;
@@ -51,5 +65,10 @@ public class ColorParser_20_5 extends ColorParser {
     @Override
     public Color fromARGB(int alpha, int red, int green, int blue) {
         return Color.fromARGB(alpha, red, green, blue);
+    }
+
+    @Override
+    public int getAlpha(Color color) {
+        return color.getAlpha();
     }
 }

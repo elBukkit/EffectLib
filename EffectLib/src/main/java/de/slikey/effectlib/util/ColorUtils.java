@@ -13,7 +13,7 @@ public class ColorUtils {
     private final ColorParser parser;
 
     public static void initialize(Logger log) {
-        logger = logger;
+        logger = log;
         instance = new ColorUtils();
     }
 
@@ -37,6 +37,10 @@ public class ColorUtils {
 
     public static Color fromARGB(int alpha, int red, int green, int blue) {
         return instance.parser.fromARGB(alpha, red, green, blue);
+    }
+
+    public static int getAlpha(Color color) {
+        return instance.parser.getAlpha(color);
     }
 
     protected ColorUtils() {
