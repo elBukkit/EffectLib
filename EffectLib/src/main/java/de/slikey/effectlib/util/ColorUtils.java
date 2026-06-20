@@ -39,7 +39,7 @@ public class ColorUtils {
         return instance.parser.fromARGB(alpha, red, green, blue);
     }
 
-    private ColorUtils() {
+    protected ColorUtils() {
         boolean hasAlpha = true;
         try {
             Color.class.getMethod("fromARGB", Integer.TYPE);
