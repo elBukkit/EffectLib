@@ -34,16 +34,16 @@ public class ColorParser_20_5 extends ColorParser {
 
         int rgba;
         if (value.equalsIgnoreCase("random")) {
-            byte red = (byte) (Math.random() * 255);
-            byte green = (byte) (Math.random() * 255);
-            byte blue = (byte) (Math.random() * 255);
+            int red = random.nextInt(255);
+            int green = random.nextInt(255);
+            int blue = random.nextInt(255);
             byte alpha = (byte) 255;
             rgba = (alpha << 24) | (red << 16) | (green << 8) | blue;
         } else if (value.equalsIgnoreCase("arandom")) {
-            byte red = (byte) (Math.random() * 255);
-            byte green = (byte) (Math.random() * 255);
-            byte blue = (byte) (Math.random() * 255);
-            byte alpha = (byte) (Math.random() * 255);
+            int red = random.nextInt(255);
+            int green = random.nextInt(255);
+            int blue = random.nextInt(255);
+            int alpha = random.nextInt(255);
             rgba = (alpha << 24) | (red << 16) | (green << 8) | blue;
         } else if (value.contains(",")) {
             String[] pieces = value.split(",");

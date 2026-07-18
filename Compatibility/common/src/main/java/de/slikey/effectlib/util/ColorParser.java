@@ -2,12 +2,14 @@ package de.slikey.effectlib.util;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Random;
 
 import org.bukkit.Color;
 import org.bukkit.configuration.ConfigurationSection;
 
 public class ColorParser {
     private Map<String, Color> colorMap;
+    protected final Random random = new Random();
 
     protected Color getColorByName(String name) {
         if (colorMap == null) {
@@ -55,9 +57,9 @@ public class ColorParser {
         }
         int rgb;
         if (value.equalsIgnoreCase("random")) {
-            byte red = (byte) (Math.random() * 255);
-            byte green = (byte) (Math.random() * 255);
-            byte blue = (byte) (Math.random() * 255);
+            int red = random.nextInt(255);
+            int green = random.nextInt(255);
+            int blue = random.nextInt(255);
             rgb = (red << 16) | (green << 8) | blue;
         } else {
             if (value.contains(",")) {
